@@ -9,6 +9,12 @@ This is work-in-progress documention for promopuffin-core the API behind promopu
 
 #### /accounts
 
+	{
+		username: "email@example.org",
+		password: "BCRYPT_value",
+		key: "UUID"
+	}
+
 * GET: List all accounts (auth admin only)
 * POST: Create new account
 
