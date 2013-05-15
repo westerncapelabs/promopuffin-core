@@ -58,3 +58,10 @@ class Account(Resource):
         return account, 201
 
 api.add_resource(Account, '/accounts/<string:account_id>')
+
+class AccountSearch(Resource):
+    def get(self):
+        """take q and search accounts based on search parameters"""
+        
+
+api.add_resource(Accounts, '/accounts/search')
