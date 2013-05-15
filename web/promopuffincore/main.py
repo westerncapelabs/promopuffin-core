@@ -2,7 +2,7 @@
 This file stops circular dependencies
 """
 
-from auth import *
+# from auth import *
 from views import *
 from accounts import Accounts, Account
 

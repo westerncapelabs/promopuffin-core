@@ -59,9 +59,9 @@ class Account(Resource):
 
 api.add_resource(Account, '/accounts/<string:account_id>')
 
-class AccountSearch(Resource):
-    def get(self):
-        """take q and search accounts based on search parameters"""
+# class AccountSearch(Resource):
+#     def get(self):
+#         """take q and search accounts based on search parameters"""
         
 
-api.add_resource(Accounts, '/accounts/search')
+# api.add_resource(Accounts, '/accounts/search')

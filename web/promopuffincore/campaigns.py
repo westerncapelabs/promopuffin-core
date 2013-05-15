@@ -33,12 +33,12 @@ class Campaigns(Resource):
 
 api.add_resource(Campaigns, '/campaigns')
 
-class CampaignSearch(Resource):
-	def get(self):
-		"""take q and search Campaigns based on search parameters"""
+# class CampaignSearch(Resource):
+# 	def get(self):
+# 		"""take q and search Campaigns based on search parameters"""
 		
 
-api.add_resource(Campaigns, '/campaigns/search')
+# api.add_resource(Campaigns, '/campaigns/search')
 
 class Campaign(Resource):
 	""" For an individual Campaign"""
