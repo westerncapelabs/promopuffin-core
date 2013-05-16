@@ -12,7 +12,7 @@ This is work-in-progress documention for promopuffin-core the API behind promopu
 	{
 		username: "email@example.org",
 		password: "BCRYPT_value",
-		key: "UUID"
+		api_key: "UUID"
 	}
 
 * GET: List all accounts (auth admin only)
@@ -31,7 +31,6 @@ This is work-in-progress documention for promopuffin-core the API behind promopu
 ### Campaigns
 
 	{
-		campaign_id: 12345678,
 		name: "Friendly name",
 		start: YYYY-MM-DDTHH:MM:SS,
 		end: YYYY-MM-DDTHH:MM:SS,
@@ -74,10 +73,20 @@ GET: Take q and scope values and search campaigns based on input (default limit 
 		"value_currency": "ZAR",
 		"minimum": 250.00,
 		"minimum_currency": "ZAR",
-		
+		"total": 50.00,
+		"remaining":28.00,
 	}
 
 #### /codes
+
+* GET: Returns all codes associated with a campaign (auth admin only)
+* POST: Creates a new code for a campaign
+
+### Code /codes/{id}
+
+* GET: Return code details (auth admin or self)
+* PUT: Update {id} if exists (auth admin or self)
+* DELETE: Delete {id} if auth admin or self is {id}
 
 
 ### Validate /validate
@@ -108,6 +117,8 @@ Returns:
 Helper endpoint to validate auth keys
 
 
+### Redeem /redeem
 
+Validates and Redeems promo voucher 
 
-
+#### /redeem

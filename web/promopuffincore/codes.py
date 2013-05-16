@@ -3,67 +3,47 @@ from app import api
 
 from shareddefs import appuuid
 
-accounts_data = {}
+codes_data = {}
 
 parser = reqparse.RequestParser()
-parser.add_argument('username', type=str)
-parser.add_argument('password', type=str)
-parser.add_argument('key', type=str, default="uuid")
+parser.add_argument('code', type=str)
+parser.add_argument('friendly_code', type=str)
+parser.add_argument('type', type=str)
+parser.add_argument('description', type=str)
+parser.add_argument('status', type=str, default="unused")
+parser.add_argument('value_type', type=str)
+parser.add_argument('value_amount', type=float, default=0)
+parser.add_argument('value_currency', type=str, default="ZAR")
+parser.add_argument('minimum', type=float, default=0)
+parser.add_argument('minimum_currency', type=str, default="ZAR")
 
 
-def abort_account_not_found(account_id):
-    if account_id not in accounts_data:
-        abort(404, message="Account {} doesn't exist".format(account_id))
+def abort_code_not_found(code_id):
+    if code_id not in codes_data:
+        abort(404, message="Code {} doesn't exist".format(code_id))
 
 
-class Accounts(Resource):
+class Codes(Resource):
     def get(self):
-        """ lists all accounts """
-        return accounts_data
+        """ lists all codes """
+        return codes_data
 
     def post(self):
-        """ saves a new account """
+        """ saves a new code """
         args = parser.parse_args()
-        # account_id = 'uuid_%d' % (len(accounts_data) + 1)
-        account_id = appuuid()
-        accounts_data[account_id] = {
-            'username': args['username'],
-            'password': args['password'],
-            "key": args['key'],
+        code_id = appuuid()
+        codes_data[code_id] = {
+            'code': args['code'],
+            'friendly_code': args['friendly_code'],
+            "type": args['type'],
+            "description": args['description'],
+            "status": args['status'],
+            "value_type": args['value_type'],
+            "value_amount": args['value_amount'],
+            "value_currency": args['value_currency'],
+            "minimum": args['minimum'],
+            "minimum_currency": args['minimum_currency'],
         }
-        return accounts_data[account_id], 201
+        return codes_data[code_id], 201
 
-api.add_resource(Accounts, '/accounts')
-
-
-class Account(Resource):
-    """ For an individual Account"""
-    def get(self, account_id):
-        """ Just one account details """
-        abort_account_not_found(account_id)
-        return accounts_data[account_id], 200
-
-    def delete(self, account_id):
-        abort_account_not_found(account_id)
-        del accounts_data[account_id]
-        return '', 204
-
-    def put(self, account_id):
-        args = parser.parse_args()
-        account = {
-            'username': args['username'],
-            'password': args['password'],
-            "key": args['key'],
-        }
-        abort_account_not_found(account_id)
-        accounts_data[account_id] = account
-        return account, 201
-
-api.add_resource(Account, '/accounts/<string:account_id>')
-
-# class AccountSearch(Resource):
-#     def get(self):
-#         """take q and search accounts based on search parameters"""
-        
-
-# api.add_resource(Accounts, '/accounts/search')
+api.add_resource(Codes, '/codes')

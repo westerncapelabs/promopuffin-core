@@ -6,6 +6,7 @@ This file stops circular dependencies
 from views import *
 from accounts import Accounts, Account
 from campaigns import Campaigns, Campaign
+from codes import Codes
 
 
 def init_db():
