@@ -34,6 +34,7 @@ This is work-in-progress documention for promopuffin-core the API behind promopu
 		name: "Friendly name",
 		start: YYYY-MM-DDTHH:MM:SS,
 		end: YYYY-MM-DDTHH:MM:SS,
+                account_key: "somekey",
 	}
 
 #### /campaigns
@@ -60,7 +61,7 @@ GET: Take q and scope values and search campaigns based on input (default limit 
 * GET: Returns a status of campaign (error, pending, running, halted)
 * POST: Request a status change to pending/running/halted
 
-### Codes /codes
+### Codes /campaigns/{id}/codes
 
 	{
 		"code": "ACT-CMP-ABCDE" (unique sys-wide),
@@ -77,12 +78,12 @@ GET: Take q and scope values and search campaigns based on input (default limit 
 		"remaining":28.00,
 	}
 
-#### /codes
+#### campaigns/{id}/codes
 
 * GET: Returns all codes associated with a campaign (auth admin only)
 * POST: Creates a new code for a campaign
 
-### Code /codes/{id}
+### Code /campaigns/{id}/codes/{id}
 
 * GET: Return code details (auth admin or self)
 * PUT: Update {id} if exists (auth admin or self)

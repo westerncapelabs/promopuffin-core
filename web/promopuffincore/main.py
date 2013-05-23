@@ -4,7 +4,8 @@ This file stops circular dependencies
 
 # from auth import *
 from views import *
-from accounts import Accounts, Account
+# from accounts import Accounts, Account
+import accounts
 from campaigns import Campaigns, Campaign
 from codes import Codes
 

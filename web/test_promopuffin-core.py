@@ -32,41 +32,41 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         assert 'Hello World!' in rv.data  # Should be the <title> of the page
 
     def test_accounts_list(self):
-        rv = self.app.get('/accounts')
+        rv = self.app.get('/accounts?auth=somekey')
         assert "user1@example.com" in rv.data
 
     def test_accounts_add_new(self):
-        rv = self.app.post("/accounts", data=test_data.data_accounts_post_good)
+        rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_post_good)
         assert "mike+testpromopuffin@westerncapelabs.com" in rv.data
 
     def test_accounts_account_found(self):
-        rv = self.app.get('/accounts/uuid_1')
+        rv = self.app.get('/accounts/uuid_1?auth=thisandthat')
         assert rv.status_code == 200
         assert "user1@example.com" in rv.data
 
     def test_accounts_account_not_found(self):
-        rv = self.app.get('/accounts/uuid_90j0j0j')
+        rv = self.app.get('/accounts/uuid_90j0j0j?auth=thisandthat')
         assert rv.status_code == 404
 
     def test_accounts_account_delete_found(self):
-        rv = self.app.delete('/accounts/uuid_1')
+        rv = self.app.delete('/accounts/uuid_1?auth=thisandthat')
         assert rv.status_code == 204
-        rv = self.app.get('/accounts/uuid_1')
+        rv = self.app.get('/accounts/uuid_1?auth=thisandthat')
         assert rv.status_code == 404
 
     def test_accounts_account_delete_not_found(self):
-        rv = self.app.delete('/accounts/uuid_342fhdjs41')
+        rv = self.app.delete('/accounts/uuid_342fhdjs41?auth=thisandthat')
         assert rv.status_code == 404
 
     def test_accounts_account_put_found(self):
-        rv = self.app.put('/accounts/uuid_1', data=test_data.data_accounts_put_good)
+        rv = self.app.put('/accounts/uuid_1?auth=thisandthat', data=test_data.data_accounts_put_good)
         assert rv.status_code == 201
-        rv = self.app.get('/accounts/uuid_1')
+        rv = self.app.get('/accounts/uuid_1?auth=thisandthat')
         assert rv.status_code == 200
         assert "user1@example.com" in rv.data
 
     def test_accounts_account_put_not_found(self):
-        rv = self.app.put('/accounts/uuid_4234jhkjhk4', data=test_data.data_accounts_put_good)
+        rv = self.app.put('/accounts/uuid_4234jhkjhk4?auth=thisandthat', data=test_data.data_accounts_put_good)
         assert rv.status_code == 404
 
     def test_campaigns_list(self):
@@ -124,6 +124,24 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
     def test_campaigns_status_update_not_found(self):
         rv = self.app.post('/campaigns/uuid_3429kjkj31/status', data=test_data.data_campaigns_status_post_good)
         assert rv.status_code == 404
+
+    #authentication tests
+    def test_accounts_post_authenticated(self):
+        pass
+
+    def test_accounts_list_not_authenticated(self):
+        rv = self.app.get('/accounts?auth=some3424gegkey')
+        assert "Unauthorized" in rv.data
+        assert rv.status_code == 401
+
+    def test_accounts_account_get_not_authenticated(self):
+        pass
+
+    def test_accounts_account_put_not_authenticated(self):
+        pass
+
+    def test_accounts_account_delete_not_authenticated(self):
+        pass
 
 if __name__ == '__main__':
     unittest.main()

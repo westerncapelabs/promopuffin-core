@@ -1,6 +1,6 @@
 from flask.ext.restful import reqparse, Resource, abort
 from app import api
-from shareddefs import appuuid
+import shareddefs
 
 accounts_data = {}
 
@@ -23,26 +23,42 @@ accounts_data_backup = {
 }
 
 parser = reqparse.RequestParser()
-parser.add_argument('username', type=str)
-parser.add_argument('password', type=str)
-parser.add_argument('key', type=str)
+parser.add_argument('username', type=unicode)
+parser.add_argument('password', type=unicode)
+parser.add_argument('key', type=unicode)
+parser.add_argument('auth', type=unicode)
 
 
 def abort_account_not_found(account_id):
     if account_id not in accounts_data:
         abort(404, message="Account {} doesn't exist".format(account_id))
 
-# @shareddefs.api_token_required
+
+def exists(account_id):
+    if account_id in accounts_data:
+        return True
+    else:
+        return False
+
+
+def get_data(account_id):
+    if exists(account_id):
+        return accounts_data[account_id]['key']
+    else:
+        return False
+
+
 class Accounts(Resource):
+    @shareddefs.admin_api_token_required
     def get(self):
         """ lists all accounts """
         return accounts_data
 
+    @shareddefs.admin_api_token_required
     def post(self):
         """ saves a new account """
         args = parser.parse_args()
         account_id = 'uuid_%d' % (len(accounts_data) + 1)
-        # account_id = appuuid()
         accounts_data[account_id] = {
             'username': args['username'],
             'password': args['password'],
@@ -52,19 +68,22 @@ class Accounts(Resource):
 
 api.add_resource(Accounts, '/accounts')
 
-# @shareddefs.api_token_required
+
 class Account(Resource):
     """ For an individual Account"""
+    @shareddefs.admin_api_token_required
     def get(self, account_id):
         """ Just one account details """
         abort_account_not_found(account_id)
         return accounts_data[account_id], 200
 
+    @shareddefs.account_api_token_required
     def delete(self, account_id):
         abort_account_not_found(account_id)
         del accounts_data[account_id]
         return '', 204
 
+    @shareddefs.account_api_token_required
     def put(self, account_id):
         args = parser.parse_args()
         account = {

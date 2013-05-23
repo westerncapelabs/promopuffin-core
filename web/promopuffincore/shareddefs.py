@@ -20,11 +20,23 @@ def appuuid():
     return str(unix_timestamp()) + '-' + random.choice(string.ascii_letters) + random.choice(string.ascii_letters)
 
 
-def api_token_required(f):
+def admin_api_token_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = request.args.get("auth", "")
-        if token == app.config['OTW_API_KEY']:
+        if token == app.config['PROMOPUFFIN_API_KEY']:
+            pass
+        else:
+            abort(401)
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def account_api_token_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.args.get("auth", "")
+        if token == get_data(account_id):
             pass
         else:
             abort(401)
