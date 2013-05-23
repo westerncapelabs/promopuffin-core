@@ -1,21 +1,38 @@
 from flask.ext.restful import reqparse, Resource, abort
 from app import api
-
 from shareddefs import appuuid
 
 accounts_data = {}
 
+accounts_data_backup = {
+    "uuid_1": {
+        "username": "user1@example.com",
+        "password": "bcryptedhash",
+        "key": "thisandthat",
+    },
+    "uuid_2": {
+        "username": "user2@example.com",
+        "password": "bcryptedhash",
+        "key": "thisandthat",
+    },
+    "uuid_3": {
+        "username": "user3@example.com",
+        "password": "bcryptedhash",
+        "key": "thisandthat",
+    },
+}
+
 parser = reqparse.RequestParser()
 parser.add_argument('username', type=str)
 parser.add_argument('password', type=str)
-parser.add_argument('key', type=str, default="uuid")
+parser.add_argument('key', type=str)
 
 
 def abort_account_not_found(account_id):
     if account_id not in accounts_data:
         abort(404, message="Account {} doesn't exist".format(account_id))
 
-
+# @shareddefs.api_token_required
 class Accounts(Resource):
     def get(self):
         """ lists all accounts """
@@ -24,8 +41,8 @@ class Accounts(Resource):
     def post(self):
         """ saves a new account """
         args = parser.parse_args()
-        # account_id = 'uuid_%d' % (len(accounts_data) + 1)
-        account_id = appuuid()
+        account_id = 'uuid_%d' % (len(accounts_data) + 1)
+        # account_id = appuuid()
         accounts_data[account_id] = {
             'username': args['username'],
             'password': args['password'],
@@ -35,7 +52,7 @@ class Accounts(Resource):
 
 api.add_resource(Accounts, '/accounts')
 
-
+# @shareddefs.api_token_required
 class Account(Resource):
     """ For an individual Account"""
     def get(self, account_id):
@@ -64,6 +81,5 @@ api.add_resource(Account, '/accounts/<string:account_id>')
 # class AccountSearch(Resource):
 #     def get(self):
 #         """take q and search accounts based on search parameters"""
-        
 
 # api.add_resource(Accounts, '/accounts/search')

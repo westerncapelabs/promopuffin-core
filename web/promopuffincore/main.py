@@ -10,7 +10,7 @@ from codes import Codes
 
 
 def init_db():
-    pass
+    accounts.accounts_data = accounts.accounts_data_backup.copy()
 
 
 @app.before_request
