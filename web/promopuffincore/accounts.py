@@ -72,21 +72,18 @@ api.add_resource(Accounts, '/accounts')
 class Account(Resource):
     """ For an individual Account"""
     @shareddefs.api_token_required
-    # @shareddefs.account_api_token_required
     def get(self, account_id):
         """ Just one account details """
         abort_account_not_found(account_id)
         return accounts_data[account_id], 200
 
     @shareddefs.api_token_required
-    # @shareddefs.account_api_token_required
     def delete(self, account_id):
         abort_account_not_found(account_id)
         del accounts_data[account_id]
         return 'Account Successfully Deleted', 204
 
     @shareddefs.api_token_required
-    # @shareddefs.account_api_token_required
     def put(self, account_id):
         args = parser.parse_args()
         account = {

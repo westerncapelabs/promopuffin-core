@@ -11,7 +11,7 @@ from codes import Codes, Code
 
 
 def init_db():
-    accounts.accounts_data = accounts.accounts_data_backup.copy()
+    pass
 
 
 @app.before_request

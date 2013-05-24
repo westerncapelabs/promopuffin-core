@@ -93,9 +93,11 @@ GET: Take q and scope values and search campaigns based on input (default limit 
 
 ### Validate /validate
 
+Need to supply code related data for validation.
+
 #### /validate
 
-GET/POST: Takes a series of variables and returns true/false
+* POST: Takes a series of codes related variables and returns true/false
 
 	{
 		"api_key": "34239840239849238098423",
@@ -116,11 +118,32 @@ Returns:
 	
 ### Auth /auth
 
-Helper endpoint to validate auth keys
+Helper endpoint to validate auth keys (TODO still)
 
+#### /auth
 
 ### Redeem /redeem
 
 Validates and Redeems promo voucher 
 
 #### /redeem
+
+* POST: Takes series of code data, validates and updates campaign voucher availability
+
+	{
+		"api_key": "34239840239849238098423",
+		"code": "ACT-CMP-ABCDE",
+		"friendly_code": "FREESHIPPING",
+		"transaction_amount": 500.00,
+		"transaction_currency": "ZAR",
+	}
+
+Returns:
+
+        {
+                "redeemed": True/False,
+                "status": "unused/available/redeemed/expired",
+                "total": 50.00,
+                "remaining": 28.00,
+        }
+

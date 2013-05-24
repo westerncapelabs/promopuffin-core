@@ -30,3 +30,15 @@ def api_token_required(f):
             abort(401)
         return f(*args, **kwargs)
     return decorated_function
+
+
+def account_api_token_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.args.get("auth", "")
+        if token == app.config['PROMOPUFFIN_API_KEY']:
+            pass
+        else:
+            abort(401)
+        return f(*args, **kwargs)
+    return decorated_function
