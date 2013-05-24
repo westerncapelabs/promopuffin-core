@@ -9,14 +9,14 @@ This is work-in-progress documention for promopuffin-core the API behind promopu
 
 #### /accounts
 
-	{
+	"uuid_1" = {
 		username: "email@example.org",
 		password: "BCRYPT_value",
 		api_key: "UUID"
 	}
 
 * GET: List all accounts (auth admin only)
-* POST: Create new account
+* POST: Create new account (auth admin only)
 
 #### /accounts/{id}
 
@@ -34,13 +34,13 @@ This is work-in-progress documention for promopuffin-core the API behind promopu
 		name: "Friendly name",
 		start: YYYY-MM-DDTHH:MM:SS,
 		end: YYYY-MM-DDTHH:MM:SS,
-                account_key: "somekey",
+                account_id: "uuid",
 	}
 
 #### /campaigns
 
 * GET: List all campaigns (auth admin only)
-* POST: Create new campaign
+* POST: Create new campaign (auth admin only)
 
 #### /campaign/search
 
@@ -58,12 +58,13 @@ GET: Take q and scope values and search campaigns based on input (default limit 
 		status: "running",
 	}
 
-* GET: Returns a status of campaign (error, pending, running, halted)
-* POST: Request a status change to pending/running/halted
+* GET: Returns a status of campaign (error, pending, running, halted) - auth admin or self is {id}
+* POST: Request a status change to pending/running/halted (auth admin or self is {id})
 
 ### Codes /campaigns/{id}/codes
 
 	{
+                "campaign_id": "uuid" (link to campaign),
 		"code": "ACT-CMP-ABCDE" (unique sys-wide),
 		"friendly_code": "FREESHIPPING" (unique in campaign)
 		"type": "fixed/percentage",
@@ -78,10 +79,10 @@ GET: Take q and scope values and search campaigns based on input (default limit 
 		"remaining":28.00,
 	}
 
-#### campaigns/{id}/codes
+#### /campaigns/{id}/codes
 
-* GET: Returns all codes associated with a campaign (auth admin only)
-* POST: Creates a new code for a campaign
+* GET: Returns all codes associated with a campaign (auth admin only or self is {id})
+* POST: Creates a new code for a campaign, linked to campaign_id (auth admin only or self is {id})
 
 ### Code /campaigns/{id}/codes/{id}
 

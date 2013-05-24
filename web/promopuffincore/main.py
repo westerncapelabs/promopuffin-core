@@ -7,7 +7,7 @@ from views import *
 # from accounts import Accounts, Account
 import accounts
 from campaigns import Campaigns, Campaign
-from codes import Codes
+from codes import Codes, Code
 
 
 def init_db():
