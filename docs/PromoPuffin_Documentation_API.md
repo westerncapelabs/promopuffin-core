@@ -128,7 +128,7 @@ Validates and Redeems promo voucher
 
 #### /redeem
 
-* POST: Takes series of code data, validates and updates campaign voucher availability
+* POST: Takes series of code data, validates and updates campaign voucher availability(auth admin or campaign who has {api_key})
 
 	{
 		"api_key": "34239840239849238098423",

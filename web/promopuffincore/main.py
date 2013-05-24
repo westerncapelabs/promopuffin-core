@@ -5,7 +5,7 @@ This file stops circular dependencies
 # from auth import *
 from views import *
 # from accounts import Accounts, Account
-import accounts
+import accounts as accounts
 from campaigns import Campaigns, Campaign
 from codes import Codes, Code
 
