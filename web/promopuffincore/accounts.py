@@ -83,7 +83,7 @@ class Account(Resource):
     def delete(self, account_id):
         abort_account_not_found(account_id)
         del accounts_data[account_id]
-        return '', 204
+        return 'Account Successfully Deleted', 204
 
     @shareddefs.api_token_required
     # @shareddefs.account_api_token_required

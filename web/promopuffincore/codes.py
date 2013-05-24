@@ -98,6 +98,6 @@ class Code(Resource):
     def delete(self, campaign_id, code_id):
         abort_code_not_found(code_id)
         del codes_data[code_id]
-        return '', 204
+        return 'Code Successfully Deleted', 204
 
 api.add_resource(Code, '/campaigns/<string:campaign_id>/codes/<string:code_id>')

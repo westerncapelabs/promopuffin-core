@@ -61,7 +61,7 @@ class Campaign(Resource):
     def delete(self, campaign_id):
         abort_campaign_not_found(campaign_id)
         del campaign_data[campaign_id]
-        return '', 204
+        return 'Campaign Successfully Deleted', 204
 
     @shareddefs.api_token_required
     def put(self, campaign_id):
