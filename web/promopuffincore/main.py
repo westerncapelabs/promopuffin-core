@@ -5,9 +5,11 @@ This file stops circular dependencies
 # from auth import *
 from views import *
 # from accounts import Accounts, Account
-import accounts as accounts
+from accounts import Accounts, Account
 from campaigns import Campaigns, Campaign
 from codes import Codes, Code
+from validate import Validate
+from redeem import Redeem
 
 
 def init_db():

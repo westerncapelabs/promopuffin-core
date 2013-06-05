@@ -13,12 +13,19 @@ parser.add_argument('transaction_currency', type=unicode, default="ZAR")
 validate_data = {}
 
 
+# TODO - check in /codes that code_id exists
 def abort_code_not_found(code_id):
     if code_id not in validate_data:
         abort(404, message="Code {} doesn't exist".format(code_id))
 
 
-# TODO still
+# TODO - check in /campaigns that campaign_id exists
+def abort_campaign_not_found(campaign_id):
+    if campaign_id not in validate_data:
+        abort(404, message="Campaign {} doesn't exist".format(campaign_id))
+
+
+# TODO
 def validate_data(data):
     response = {
         "valid": True,
@@ -26,6 +33,9 @@ def validate_data(data):
         "value_amount": 50.00,
         "value_currency": "ZAR",
     }
+
+    abort_code_not_found(data['code'])
+
     return response
 
 

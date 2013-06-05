@@ -37,3 +37,7 @@ nosetests.xml
 
 # Mac stuff
 .DS_Store
+
+rm_pyc_files.sh
+myvirtualenv/
+*.swp

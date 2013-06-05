@@ -18,14 +18,20 @@ def abort_code_not_found(code_id):
         abort(404, message="Code {} doesn't exist".format(code_id))
 
 
+def abort_campaign_not_found(campaign_id):
+    if campaign_id not in redeemed_data:
+        abort(404, message="Campaign {} doesn't exist".format(campaign_id))
+
+
 # TODO still
 def redeem_data(data):
     response = {
         "valid": True,
-        "value_type": "fixed",
-        "value_amount": 50.00,
-        "value_currency": "ZAR",
+        "status": "available",
+        "total": 50.00,
+        "remaining": 28.00,
     }
+    abort_code_not_found(data['code'])
     return response
 
 
