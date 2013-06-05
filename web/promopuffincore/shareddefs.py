@@ -1,5 +1,6 @@
 from flask import request, abort
 from functools import wraps
+import main
 
 import string
 import random  # for unique key gen
@@ -24,19 +25,7 @@ def api_token_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = request.args.get("auth", "")
-        if token == app.config['PROMOPUFFIN_API_KEY']:
-            pass
-        else:
-            abort(401)
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-def account_api_token_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        token = request.args.get("auth", "")
-        if token == app.config['PROMOPUFFIN_API_KEY']:
+        if token == app.config['PROMOPUFFIN_API_KEY'] or token == main.auth_account_apikey():
             pass
         else:
             abort(401)

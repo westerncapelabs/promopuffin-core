@@ -87,7 +87,7 @@ GET: Take q and scope values and search campaigns based on input (default limit 
 ### Code /campaigns/{id}/codes/{id}
 
 * GET: Return code details (auth admin or self)
-* PUT: Update {id} if exists (auth admin or self)
+* PUT: Update {id} if exists (auth admin or self), cannot change the campaign id, with which this code is associated with at the moment.
 * DELETE: Delete {id} if auth admin or self is {id}
 
 

@@ -8,24 +8,24 @@ accounts_data = {}
 #     "uuid_1": {
 #         "username": "user1@example.com",
 #         "password": "bcryptedhash",
-#         "key": "thisandthat",
+#         "api_key": "thisandthat",
 #     },
 #     "uuid_2": {
 #         "username": "user2@example.com",
 #         "password": "bcryptedhash",
-#         "key": "thisandthat",
+#         "api_key": "thisandthat",
 #     },
 #     "uuid_3": {
 #         "username": "user3@example.com",
 #         "password": "bcryptedhash",
-#         "key": "thisandthat",
+#         "api_key": "thisandthat",
 #     },
 # }
 
 parser = reqparse.RequestParser()
 parser.add_argument('username', type=unicode)
 parser.add_argument('password', type=unicode)
-parser.add_argument('key', type=unicode)
+parser.add_argument('api_key', type=unicode)
 parser.add_argument('auth', type=unicode)
 
 
@@ -43,7 +43,7 @@ def exists(account_id):
 
 def get_data(account_id):
     if exists(account_id):
-        return accounts_data[account_id]['key']
+        return accounts_data[account_id]['api_key']
     else:
         return False
 
@@ -62,7 +62,7 @@ class Accounts(Resource):
         accounts_data[account_id] = {
             'username': args['username'],
             'password': args['password'],
-            "key": args['key'],
+            "api_key": args['api_key'],
         }
         return accounts_data[account_id], 201
 
@@ -89,7 +89,7 @@ class Account(Resource):
         account = {
             'username': args['username'],
             'password': args['password'],
-            "key": args['key'],
+            "api_key": args['api_key'],
         }
         abort_account_not_found(account_id)
         accounts_data[account_id] = account

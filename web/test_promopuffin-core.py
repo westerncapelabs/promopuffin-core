@@ -42,7 +42,7 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         assert "mike+testpromopuffin@westerncapelabs.com" in rv.data
 
     def test_accounts_account_found(self):
-        rv = self.app.get('/accounts/uuid_1?auth=somekey')
+        rv = self.app.get('/accounts/uuid_1?auth=thisandthat')
         assert rv.status_code == 200
         assert "user1@example.com" in rv.data
 
@@ -253,6 +253,15 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
     def test_campaigns_campaign_codes_code_put_not_found(self):
         rv = self.app.put('/campaigns/uuid_1/codes/uuid_432dfs341?auth=somekey', data=test_data.data_campaigns_codes_put_good)
         assert rv.status_code == 404
+
+    """ Test cross-file/class communication """
+    # def test_accounts_validation_from_main_found(self):
+    #     rv = main.validate_accounts("uuid_1")
+    #     assert "True" in rv
+
+    # def test_accounts_validation_from_main_not_found(self):
+    #     rv = main.validate_accounts("uuid_1dfsdfs")
+    #     assert "False" in rv
 
 if __name__ == '__main__':
     unittest.main()
