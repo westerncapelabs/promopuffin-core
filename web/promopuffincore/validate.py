@@ -1,4 +1,4 @@
-from flask.ext.restful import reqparse, Resource, abort
+from flask.ext.restful import reqparse, Resource
 from app import api
 
 import main
@@ -15,27 +15,38 @@ validate_data = {}
 
 
 def validate_data(data):
-    main.codes.abort_code_not_found(data['code_id'])
-    code_data = main.codes.codes_data[data['code_id']]
+    code_data = main.codes.get_data(data['code_id'])
     response = {
         "valid": False,
-        "value_type": code_data['value_type'],
-        "value_amount": code_data['value_amount'],
-        "value_currency": code_data['value_currency'],
+        "error": [],
     }
 
-    if code_data['code'] != data['code'] or code_data['friendly_code'] != data['friendly_code'] or code_data['value_currency'] != data['transaction_currency']:
-        return response
+    # list of validation of checks
+    if code_data['code'] != data['code']:
+        response['error'].append("code did not match campaign code(unique system-wide)")
+
+    if code_data['friendly_code'] != data['friendly_code']:
+        response['error'].append("friendly_code did not match campaign friendly_code(unique per campaign)")
+
+    if code_data['value_currency'] != data['transaction_currency']:
+        response['error'].append("value_currency did not match campaign currency")
+
     if data['transaction_amount'] < code_data['minimum']:
-        return response
+        response['error'].append("transaction_amount was less than campaign minimum")
 
-    main.campaigns.abort_campaign_not_found(code_data['campaign_id'])
-    account_id = main.campaigns.campaigns_data[code_data['campaign_id']]['account_id']
-    main.accounts.abort_account_not_found(account_id)
-    if data['api_key'] != main.accounts.accounts_data[account_id]['api_key']:
-        return response
+    account_id = main.campaigns.get_data(code_data['campaign_id'])['account_id']
+    if data['api_key'] != main.accounts.get_data(account_id)['api_key']:
+        response['error'].append("api_key did not match accounts api_key for campaign")
 
-    response['valid'] = True
+    # check if any errors in validation
+    if len(response['error']) == 0:
+        response = {
+            "valid": True,
+            "value_type": code_data['value_type'],
+            "value_amount": code_data['value_amount'],
+            "value_currency": code_data['value_currency'],
+        }
+
     return response
 
 

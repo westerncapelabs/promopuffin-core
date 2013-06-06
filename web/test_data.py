@@ -168,7 +168,7 @@ data_validation_post_good = {
 data_validation_post_bad = {
     'code_id': "uuid_1",
     'api_key': "dsfjskdfjsl",
-    "code": "ACT-EKL-ABCDEF",
+    "code": "ACT-EKL-ABEDTF",
     "friendly_code": "FREESHIPPING",
     "transaction_amount": 500.00,
     "transaction_currency": "USD",

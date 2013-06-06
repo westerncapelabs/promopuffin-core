@@ -1,5 +1,5 @@
 import unittest
-from promopuffincore import main, accounts, campaigns, codes, validate
+from promopuffincore import main, accounts, campaigns, codes
 import test_data
 
 
@@ -257,11 +257,13 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
     """ Validation Tests """
     def test_validate_success(self):
         rv = self.app.post('/validate', data=test_data.data_validation_post_good)
+        # print rv.data
         assert rv.status_code == 201
         assert "true" in rv.data
 
     def test_validate_fail(self):
         rv = self.app.post('/validate', data=test_data.data_validation_post_bad)
+        # print rv.data
         assert rv.status_code == 404
         assert "false" in rv.data
 
