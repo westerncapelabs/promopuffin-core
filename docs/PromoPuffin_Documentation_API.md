@@ -116,12 +116,6 @@ Returns:
 		"value_amount": 50.00,
 		"value_currency": "ZAR", 
 	}
-	
-### Auth /auth
-
-Helper endpoint to validate auth keys (TODO still)
-
-#### /auth
 
 ### Redeem /redeem
 
