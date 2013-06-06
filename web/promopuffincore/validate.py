@@ -43,9 +43,12 @@ def validate_data(data):
         response = {
             "valid": True,
             "value_type": code_data['value_type'],
-            "value_amount": code_data['value_amount'],
             "value_currency": code_data['value_currency'],
         }
+        if code_data['value_type'] == 'fixed':
+            response['value_amount'] = data['transaction_amount'] - code_data['value_amount']
+        elif code_data['value_type'] == 'percentage':
+            response['value_amount'] = data['transaction_amount'] * (code_data['value_amount']/100)
 
     return response
 
@@ -66,7 +69,7 @@ class Validate(Resource):
         if response['valid'] is True:
             return response, 201
         else:
-            return response, 404
+            return response, 400
 
 
 api.add_resource(Validate, '/validate')

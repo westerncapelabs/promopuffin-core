@@ -255,16 +255,19 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         assert rv.status_code == 404
 
     """ Validation Tests """
-    def test_validate_success(self):
-        rv = self.app.post('/validate', data=test_data.data_validation_post_good)
-        # print rv.data
+    def test_validate_success_percentage(self):
+        rv = self.app.post('/validate', data=test_data.data_validation_post_percentage_good)
+        assert rv.status_code == 201
+        assert "true" in rv.data
+
+    def test_validate_success_fixed(self):
+        rv = self.app.post('/validate', data=test_data.data_validation_post_fixed_good)
         assert rv.status_code == 201
         assert "true" in rv.data
 
     def test_validate_fail(self):
         rv = self.app.post('/validate', data=test_data.data_validation_post_bad)
-        # print rv.data
-        assert rv.status_code == 404
+        assert rv.status_code == 400
         assert "false" in rv.data
 
 if __name__ == '__main__':

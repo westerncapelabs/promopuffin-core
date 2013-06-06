@@ -53,7 +53,6 @@ GET: Take q and scope values and search campaigns based on input (default limit 
                 "campaign_id": "uuid" (link to campaign),
 		"code": "ACT-CMP-ABCDE" (unique sys-wide),
 		"friendly_code": "FREESHIPPING" (unique in campaign)
-		"type": "fixed/percentage",
 		"description": "A friendly name of the code",
 		"status": "unused/available/redeemed/expired",
 		"value_type": "fixed/percentage",

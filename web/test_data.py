@@ -81,10 +81,9 @@ data_campaigns_codes_data = {
         'campaign_id': 'uuid_1',
         'code': 'ACT-EKL-ABCDEF',
         'friendly_code': 'FREESHIPPING',
-        "type": "fixed",
         "description": "A friendly name of the code",
         "status": "availiable",
-        "value_type": "fixed",
+        "value_type": "percentage",
         "value_amount": 50.00,
         "value_currency": "ZAR",
         "minimum": 250.00,
@@ -96,7 +95,6 @@ data_campaigns_codes_data = {
         'campaign_id': 'uuid_2',
         'code': 'ACT-EMD-ABCOSX',
         'friendly_code': 'FREESHIPPING',
-        "type": "fixed",
         "description": "A friendly name of the code",
         "status": "availiable",
         "value_type": "fixed",
@@ -111,7 +109,6 @@ data_campaigns_codes_data = {
         'campaign_id': 'uuid_3',
         'code': 'QWZ-EMD-ABCDEF',
         'friendly_code': 'FREESHIPPING',
-        "type": "fixed",
         "description": "A friendly name of the code",
         "status": "availiable",
         "value_type": "fixed",
@@ -128,10 +125,9 @@ data_campaigns_codes_post_good = {
     'campaign_id': 'uuid_1',
     'code': 'ABC-DEF-GIJKLM',
     'friendly_code': 'DISCOUNTS',
-    "type": "percentage",
     "description": "A friendly name of the code",
     "status": "availiable",
-    "value_type": "percentage",
+    "value_type": "fixed",
     "value_amount": 50.00,
     "value_currency": "ZAR",
     "minimum": 250.00,
@@ -144,7 +140,6 @@ data_campaigns_codes_put_good = {
     'campaign_id': 'uuid_1',
     'code': 'ABC-DEF-GIJKLM',
     'friendly_code': 'DISCOUNTS',
-    "type": "fixed",
     "description": "A friendly name of the code",
     "status": "redeemed",
     "value_type": "fixed",
@@ -156,10 +151,19 @@ data_campaigns_codes_put_good = {
     "remaining": 28.00,
 }
 
-data_validation_post_good = {
+data_validation_post_percentage_good = {
     'code_id': "uuid_1",
     'api_key': "thisandthat",
     "code": "ACT-EKL-ABCDEF",
+    "friendly_code": "FREESHIPPING",
+    "transaction_amount": 500.00,
+    "transaction_currency": "ZAR",
+}
+
+data_validation_post_fixed_good = {
+    'code_id': "uuid_2",
+    'api_key': "thisandthat",
+    "code": "ACT-EMD-ABCOSX",
     "friendly_code": "FREESHIPPING",
     "transaction_amount": 500.00,
     "transaction_currency": "ZAR",
