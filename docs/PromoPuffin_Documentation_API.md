@@ -74,8 +74,8 @@ GET: Take q and scope values and search campaigns based on input (default limit 
 		"value_amount": 50.00,
 		"value_currency": "ZAR",
 		"minimum": 250.00,
-		"minimum_currency": "ZAR",
 		"total": 50.00,
+                "history": {} (collection of timestaps for redeemed vouchers),
 		"remaining":28.00,
 	}
 

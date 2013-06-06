@@ -14,34 +14,33 @@ parser.add_argument('transaction_currency', type=unicode, default="ZAR")
 validate_data = {}
 
 
-def abort_code_not_found(code_id):
-    if code_id not in main.codes.codes_data:
-        abort(404, message="Code {} doesn't exist".format(code_id))
-
-
-def abort_campaign_not_found(campaign_id):
-    if campaign_id not in main.campaigns.campaigns_data:
-        abort(404, message="Campaign {} doesn't exist".format(campaign_id))
-
-
-# TODO
 def validate_data(data):
+    main.codes.abort_code_not_found(data['code_id'])
+    code_data = main.codes.codes_data[data['code_id']]
     response = {
-        "valid": True,
-        "value_type": "fixed",
-        "value_amount": 50.00,
-        "value_currency": "ZAR",
+        "valid": False,
+        "value_type": code_data['value_type'],
+        "value_amount": code_data['value_amount'],
+        "value_currency": code_data['value_currency'],
     }
 
-    abort_code_not_found(data['code'])
-    code_data = main.codes.codes_data[data['code']]
+    if code_data['code'] != data['code'] or code_data['friendly_code'] != data['friendly_code'] or code_data['value_currency'] != data['transaction_currency']:
+        return response
+    if data['transaction_amount'] < code_data['minimum']:
+        return response
 
+    main.campaigns.abort_campaign_not_found(code_data['campaign_id'])
+    account_id = main.campaigns.campaigns_data[code_data['campaign_id']]['account_id']
+    main.accounts.abort_account_not_found(account_id)
+    if data['api_key'] != main.accounts.accounts_data[account_id]['api_key']:
+        return response
+
+    response['valid'] = True
     return response
 
 
 class Validate(Resource):
     """ Validates code data """
-    # @shareddefs.validate_api_token_required
     def post(self):
         args = parser.parse_args()
         data = {
@@ -52,7 +51,11 @@ class Validate(Resource):
             'transaction_amount': args['transaction_amount'],
             'transaction_currency': args['transaction_currency'],
         }
-        return validate_data(data), 201
+        response = validate_data(data)
+        if response['valid'] is True:
+            return response, 201
+        else:
+            return response, 404
 
 
 api.add_resource(Validate, '/validate')

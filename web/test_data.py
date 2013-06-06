@@ -155,3 +155,21 @@ data_campaigns_codes_put_good = {
     "total": 50.00,
     "remaining": 28.00,
 }
+
+data_validation_post_good = {
+    'code_id': "uuid_1",
+    'api_key': "thisandthat",
+    "code": "ACT-EKL-ABCDEF",
+    "friendly_code": "FREESHIPPING",
+    "transaction_amount": 500.00,
+    "transaction_currency": "ZAR",
+}
+
+data_validation_post_bad = {
+    'code_id': "uuid_1",
+    'api_key': "dsfjskdfjsl",
+    "code": "ACT-EKL-ABCDEF",
+    "friendly_code": "FREESHIPPING",
+    "transaction_amount": 500.00,
+    "transaction_currency": "USD",
+}
