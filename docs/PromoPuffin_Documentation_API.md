@@ -188,7 +188,7 @@ GET: Take q and scope values and search campaigns based on input (default limit 
                 "value_currency": "ZAR",
                 "minimum": 250.00,
                 "total": 50.00,
-                "history": {} (collection of timestaps for redeemed vouchers),
+                "history": [] (collection of timestaps for redeemed vouchers),
                 "remaining": 28.00,
 	}
 
@@ -253,12 +253,19 @@ Validates and Redeems promo voucher
 		"transaction_currency": "ZAR",
         }
 
-Returns:
+Returns If True:
 
         {
-                "redeemed": True/False,
+                "redeemed": True,
                 "status": "unused/available/redeemed/expired",
                 "total": 50.00,
                 "remaining": 28.00,
         }
+
+or If False:
+
+		{
+				"redeemed": False,
+				"errors": [] (list of error msgs),
+		}
 

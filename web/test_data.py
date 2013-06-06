@@ -82,13 +82,14 @@ data_campaigns_codes_data = {
         'code': 'ACT-EKL-ABCDEF',
         'friendly_code': 'FREESHIPPING',
         "description": "A friendly name of the code",
-        "status": "availiable",
+        "status": "available",
         "value_type": "percentage",
         "value_amount": 50.00,
         "value_currency": "ZAR",
         "minimum": 250.00,
         "minimum_currency": "ZAR",
         "total": 50.00,
+        "history": [],
         "remaining": 28.00,
     },
     "uuid_2": {
@@ -96,14 +97,15 @@ data_campaigns_codes_data = {
         'code': 'ACT-EMD-ABCOSX',
         'friendly_code': 'FREESHIPPING',
         "description": "A friendly name of the code",
-        "status": "availiable",
+        "status": "unused",
         "value_type": "fixed",
         "value_amount": 50.00,
         "value_currency": "ZAR",
         "minimum": 250.00,
         "minimum_currency": "ZAR",
         "total": 50.00,
-        "remaining": 28.00,
+        "history": [],
+        "remaining": 0.00,
     },
     "uuid_3": {
         'campaign_id': 'uuid_3',
@@ -117,6 +119,7 @@ data_campaigns_codes_data = {
         "minimum": 250.00,
         "minimum_currency": "ZAR",
         "total": 50.00,
+        "history": [],
         "remaining": 28.00,
     },
 }
@@ -176,4 +179,22 @@ data_validation_post_bad = {
     "friendly_code": "FREESHIPPING",
     "transaction_amount": 500.00,
     "transaction_currency": "USD",
+}
+
+data_redeem_percentage_good = {
+    'code_id': "uuid_1",
+    'api_key': "thisandthat",
+    "code": "ACT-EKL-ABCDEF",
+    "friendly_code": "FREESHIPPING",
+    "transaction_amount": 500.00,
+    "transaction_currency": "ZAR",
+}
+
+data_redeem_percentage_bad = {
+    'code_id': "uuid_2",
+    'api_key': "thisandthat",
+    "code": "ACT-EMD-ABCOSX",
+    "friendly_code": "FREESHIPPING",
+    "transaction_amount": 500.00,
+    "transaction_currency": "ZAR",
 }

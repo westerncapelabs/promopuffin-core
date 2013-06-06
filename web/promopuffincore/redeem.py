@@ -1,53 +1,72 @@
-from flask.ext.restful import reqparse, Resource, abort
+from flask.ext.restful import reqparse, Resource
 from app import api
 
+import main
 import shareddefs
 
 parser = reqparse.RequestParser()
+parser.add_argument('code_id', type=unicode)
 parser.add_argument('api_key', type=unicode)
 parser.add_argument('code', type=unicode)
 parser.add_argument('friendly_code', type=unicode)
 parser.add_argument('transaction_amount', type=float, default=0)
 parser.add_argument('transaction_currency', type=unicode, default="ZAR")
 
-redeemed_data = {}
 
-
-def abort_code_not_found(code_id):
-    if code_id not in redeemed_data:
-        abort(404, message="Code {} doesn't exist".format(code_id))
-
-
-def abort_campaign_not_found(campaign_id):
-    if campaign_id not in redeemed_data:
-        abort(404, message="Campaign {} doesn't exist".format(campaign_id))
-
-
-# TODO still
 def redeem_data(data):
     response = {
-        "valid": True,
-        "status": "available",
-        "total": 50.00,
-        "remaining": 28.00,
+        "redeemed": False,
+        "error": [],
     }
-    abort_code_not_found(data['code'])
+
+    # list of validation checks
+    code_data = main.codes.get_data(data['code_id'])
+    if code_data['remaining'] < 1:
+        response['error'].append("no more redeem codes available")
+
+    if code_data['status'] is not "available":
+        response['error'].append("campaign is "+code_data['status'])
+
+    if len(response['error']) == 0:
+        response = {
+            "redeemed": True,
+            "status": code_data['status'],
+            "total": code_data['total'],
+            "remaining": code_data['remaining'] - 1,
+        }
+
+        # redeem code
+        code_data['history'].append(shareddefs.appuuid())
+        code_data['remaining'] -= 1
+        if code_data['remaining'] == 0:
+            code_data['status'] = "redeemed"
+        main.codes.set_data(data['code_id'], code_data)  # updates campaign codes_data
+
     return response
 
 
 class Redeem(Resource):
     """ Validates code data """
-    # @shareddefs.api_token_required
+    # @shareddefs.campaigns_api_token_required
     def post(self):
         args = parser.parse_args()
         data = {
+            'code_id': args['code_id'],
             'api_key': args['api_key'],
             'code': args['code'],
             'friendly_code': args['friendly_code'],
             'transaction_amount': args['transaction_amount'],
             'transaction_currency': args['transaction_currency'],
         }
-        return redeemed_data(data), 201
+        validation_response = main.validate.validate_data(data)
+        if validation_response['valid'] is True:
+            response = redeem_data(data)
+            if response['redeemed'] is True:
+                return response, 201
+            else:
+                return response, 400
+        else:
+            return validation_response, 400  # bad request
 
 
 api.add_resource(Redeem, '/redeem')

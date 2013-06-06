@@ -17,6 +17,7 @@ parser.add_argument('value_currency', type=unicode, default="ZAR")
 parser.add_argument('minimum', type=float, default=0)
 parser.add_argument('minimum_currency', type=unicode, default="ZAR")
 parser.add_argument('total', type=float, default=0)
+parser.add_argument('history', type=unicode)
 parser.add_argument('remaining', type=float, default=0)
 
 
@@ -38,6 +39,11 @@ def find_all_campaign_codes(campaign_id):
 def get_data(code_id):
     abort_code_not_found(code_id)
     return dict(codes_data[code_id])
+
+
+def set_data(code_id, data):
+    abort_code_not_found(code_id)
+    codes_data[code_id] = data
 
 
 class Codes(Resource):
@@ -65,6 +71,7 @@ class Codes(Resource):
             "minimum": args['minimum'],
             "minimum_currency": args['minimum_currency'],
             "total": args['total'],
+            "history": [],
             "remaining": args['remaining'],
         }
         return codes_data[code_id], 201
@@ -94,6 +101,7 @@ class Code(Resource):
             "minimum": args['minimum'],
             "minimum_currency": args['minimum_currency'],
             "total": args['total'],
+            "history": args['history'],
             "remaining": args['remaining'],
         }
         abort_code_not_found(code_id)

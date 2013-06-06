@@ -270,5 +270,19 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         assert rv.status_code == 400
         assert "false" in rv.data
 
+    """ Redeemed Tests """
+    def test_redeem_percentage_success(self):
+        rv = self.app.post('/redeem', data=test_data.data_redeem_percentage_good)
+        print rv.data
+        assert rv.status_code == 201
+        assert "true" in rv.data
+
+    def test_redeem_percentage_fail(self):
+        rv = self.app.post('/redeem', data=test_data.data_redeem_percentage_bad)
+        print rv.data
+        assert rv.status_code == 400
+        assert "false" in rv.data
+
+
 if __name__ == '__main__':
     unittest.main()
