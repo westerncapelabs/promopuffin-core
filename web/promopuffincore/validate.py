@@ -1,9 +1,10 @@
 from flask.ext.restful import reqparse, Resource, abort
 from app import api
 
-import shareddefs
+import main
 
 parser = reqparse.RequestParser()
+parser.add_argument('code_id', type=unicode)
 parser.add_argument('api_key', type=unicode)
 parser.add_argument('code', type=unicode)
 parser.add_argument('friendly_code', type=unicode)
@@ -13,15 +14,13 @@ parser.add_argument('transaction_currency', type=unicode, default="ZAR")
 validate_data = {}
 
 
-# TODO - check in /codes that code_id exists
 def abort_code_not_found(code_id):
-    if code_id not in validate_data:
+    if code_id not in main.codes.codes_data:
         abort(404, message="Code {} doesn't exist".format(code_id))
 
 
-# TODO - check in /campaigns that campaign_id exists
 def abort_campaign_not_found(campaign_id):
-    if campaign_id not in validate_data:
+    if campaign_id not in main.campaigns.campaigns_data:
         abort(404, message="Campaign {} doesn't exist".format(campaign_id))
 
 
@@ -35,6 +34,7 @@ def validate_data(data):
     }
 
     abort_code_not_found(data['code'])
+    code_data = main.codes.codes_data[data['code']]
 
     return response
 
@@ -45,6 +45,7 @@ class Validate(Resource):
     def post(self):
         args = parser.parse_args()
         data = {
+            'code_id': args['code_id'],
             'api_key': args['api_key'],
             'code': args['code'],
             'friendly_code': args['friendly_code'],
