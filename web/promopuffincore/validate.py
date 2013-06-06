@@ -69,7 +69,7 @@ class Validate(Resource):
         if response['valid'] is True:
             return response, 201
         else:
-            return response, 400
+            return response, 400  # bad request
 
 
 api.add_resource(Validate, '/validate')
