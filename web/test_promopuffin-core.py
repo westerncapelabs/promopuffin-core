@@ -254,14 +254,21 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         rv = self.app.put('/campaigns/uuid_1/codes/uuid_432dfs341?auth=somekey', data=test_data.data_campaigns_codes_put_good)
         assert rv.status_code == 404
 
-    """ Test cross-file/class communication """
-    # def test_accounts_validation_from_main_found(self):
-    #     rv = main.validate_accounts("uuid_1")
-    #     assert "True" in rv
+    """ Validation Tests """
+    def test_validate_success_percentage(self):
+        rv = self.app.post('/validate', data=test_data.data_validation_post_percentage_good)
+        assert rv.status_code == 201
+        assert "true" in rv.data
 
-    # def test_accounts_validation_from_main_not_found(self):
-    #     rv = main.validate_accounts("uuid_1dfsdfs")
-    #     assert "False" in rv
+    def test_validate_success_fixed(self):
+        rv = self.app.post('/validate', data=test_data.data_validation_post_fixed_good)
+        assert rv.status_code == 201
+        assert "true" in rv.data
+
+    def test_validate_fail(self):
+        rv = self.app.post('/validate', data=test_data.data_validation_post_bad)
+        assert rv.status_code == 400
+        assert "false" in rv.data
 
 if __name__ == '__main__':
     unittest.main()

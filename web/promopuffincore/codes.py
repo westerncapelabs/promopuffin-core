@@ -34,6 +34,12 @@ def find_all_campaign_codes(campaign_id):
     return temp_data
 
 
+# returns a copy of codes_data
+def get_data(code_id):
+    abort_code_not_found(code_id)
+    return dict(codes_data[code_id])
+
+
 class Codes(Resource):
     @shareddefs.campaigns_api_token_required
     def get(self, campaign_id):

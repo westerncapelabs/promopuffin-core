@@ -19,6 +19,12 @@ def abort_campaign_not_found(campaign_id):
         abort(404, message="Campaign {} doesn't exist".format(campaign_id))
 
 
+# returns a copy of campaigns_data
+def get_data(campaign_id):
+    abort_campaign_not_found(campaign_id)
+    return dict(campaigns_data[campaign_id])
+
+
 class Campaigns(Resource):
     @shareddefs.campaigns_api_token_required
     def get(self):
