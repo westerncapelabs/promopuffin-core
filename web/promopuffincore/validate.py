@@ -41,7 +41,7 @@ def validate_data(data):
 
 class Validate(Resource):
     """ Validates code data """
-    @shareddefs.api_token_required
+    # @shareddefs.validate_api_token_required
     def post(self):
         args = parser.parse_args()
         data = {

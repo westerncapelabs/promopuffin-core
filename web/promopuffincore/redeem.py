@@ -37,7 +37,7 @@ def redeem_data(data):
 
 class Redeem(Resource):
     """ Validates code data """
-    @shareddefs.api_token_required
+    # @shareddefs.api_token_required
     def post(self):
         args = parser.parse_args()
         data = {

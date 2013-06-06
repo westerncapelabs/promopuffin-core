@@ -14,7 +14,7 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         # main.app.config['DATABASE'] = db_conf
         main.app.config['TESTING'] = True
         accounts.accounts_data = dict(test_data.data_accounts_data)
-        campaigns.campaign_data = dict(test_data.data_campaigns_data)
+        campaigns.campaigns_data = dict(test_data.data_campaigns_data)
         codes.codes_data = dict(test_data.data_campaigns_codes_data)
         self.app = main.app.test_client()
 
@@ -42,7 +42,7 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         assert "mike+testpromopuffin@westerncapelabs.com" in rv.data
 
     def test_accounts_account_found(self):
-        rv = self.app.get('/accounts/uuid_1?auth=thisandthat')
+        rv = self.app.get('/accounts/uuid_1?auth=somekey')
         assert rv.status_code == 200
         assert "user1@example.com" in rv.data
 

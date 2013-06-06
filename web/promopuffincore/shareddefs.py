@@ -21,11 +21,42 @@ def appuuid():
     return str(unix_timestamp()) + '-' + random.choice(string.ascii_letters) + random.choice(string.ascii_letters)
 
 
-def api_token_required(f):
+def accounts_api_token_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = request.args.get("auth", "")
-        if token == app.config['PROMOPUFFIN_API_KEY'] or token == main.auth_account_apikey():
+        if 'account_id' in kwargs:
+            main.accounts.abort_account_not_found(kwargs['account_id'])
+            if token == main.accounts.accounts_data[kwargs['account_id']]['api_key']:
+                pass
+            elif token == app.config['PROMOPUFFIN_API_KEY']:
+                pass
+            else:
+                abort(401)
+        elif token == app.config['PROMOPUFFIN_API_KEY']:
+            pass
+        else:
+            abort(401)
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def campaigns_api_token_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.args.get("auth", "")
+        # print kwargs
+        if 'campaign_id' in kwargs:
+            main.campaigns.abort_campaign_not_found(kwargs['campaign_id'])
+            account_id = main.campaigns.campaigns_data[kwargs['campaign_id']]['account_id']
+            main.accounts.abort_account_not_found(account_id)
+            if token == main.accounts.accounts_data[account_id]['api_key']:
+                pass
+            elif token == app.config['PROMOPUFFIN_API_KEY']:
+                pass
+            else:
+                abort(401)
+        elif token == app.config['PROMOPUFFIN_API_KEY']:
             pass
         else:
             abort(401)

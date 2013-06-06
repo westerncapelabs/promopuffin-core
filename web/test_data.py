@@ -3,13 +3,13 @@ data_auth = "TESTAUTHCODE"
 data_auth_admin = "TESTAUTHADMINCODE"
 
 data_accounts_post_good = {
-    "key": data_auth_admin,
+    "api_key": data_auth_admin,
     "username": "mike+testpromopuffin@westerncapelabs.com",
     "password": "testweak"
 }
 
 data_accounts_put_good = {
-    "key": data_auth_admin,
+    "api_key": data_auth_admin,
     "username": "user1@example.com",
     "password": "testweak"
 }
@@ -18,17 +18,17 @@ data_accounts_data = {
     "uuid_1": {
         "username": "user1@example.com",
         "password": "bcryptedhash",
-        "key": "thisandthat",
+        "api_key": "thisandthat",
     },
     "uuid_2": {
         "username": "user2@example.com",
         "password": "bcryptedhash",
-        "key": "thisandthat",
+        "api_key": "thisandthat",
     },
     "uuid_3": {
         "username": "user3@example.com",
         "password": "bcryptedhash",
-        "key": "thisandthat",
+        "api_key": "thisandthat",
     },
 }
 

@@ -12,18 +12,7 @@ from redeem import Redeem
 
 import accounts as accounts
 import campaigns as campaigns
-
-
-def auth_account_apikey():
-    # if account_id not in accounts.accounts_data:
-    #     return "Error: Account does not exists"
-    return "thisandthat"
-
-
-def validate_accounts(account_id):
-    if account_id in accounts.accounts_data:
-        return True
-    return False
+import codes as codes
 
 
 def init_db():

@@ -35,12 +35,12 @@ def find_all_campaign_codes(campaign_id):
 
 
 class Codes(Resource):
-    @shareddefs.api_token_required
+    @shareddefs.campaigns_api_token_required
     def get(self, campaign_id):
         """ lists all codes """
         return find_all_campaign_codes(campaign_id)
 
-    @shareddefs.api_token_required
+    @shareddefs.campaigns_api_token_required
     def post(self, campaign_id):
         """ saves a new code """
         args = parser.parse_args()
@@ -68,12 +68,12 @@ api.add_resource(Codes, '/campaigns/<string:campaign_id>/codes')
 
 class Code(Resource):
     """ Individual Code """
-    @shareddefs.api_token_required
+    @shareddefs.campaigns_api_token_required
     def get(self, campaign_id, code_id):
         abort_code_not_found(code_id)
         return codes_data[code_id], 200
 
-    @shareddefs.api_token_required
+    @shareddefs.campaigns_api_token_required
     def put(self, campaign_id, code_id):
         args = parser.parse_args()
         code = {
@@ -94,7 +94,7 @@ class Code(Resource):
         codes_data[code_id] = code
         return code, 201
 
-    @shareddefs.api_token_required
+    @shareddefs.campaigns_api_token_required
     def delete(self, campaign_id, code_id):
         abort_code_not_found(code_id)
         del codes_data[code_id]
