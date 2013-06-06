@@ -34,18 +34,10 @@ def abort_account_not_found(account_id):
         abort(404, message="Account {} doesn't exist".format(account_id))
 
 
-def exists(account_id):
-    if account_id in accounts_data:
-        return True
-    else:
-        return False
-
-
+# returns a copy of accounts_data
 def get_data(account_id):
-    if exists(account_id):
-        return accounts_data[account_id]['api_key']
-    else:
-        return False
+    abort_account_not_found(account_id)
+    return dict(accounts_data[account_id])
 
 
 class Accounts(Resource):
