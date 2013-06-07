@@ -98,6 +98,7 @@ Need to supply code related data for validation.
 
 * POST: Takes a series of codes related variables and returns true/false
 
+
 	{
 		"code_id": "uuid" (used to locate code data),
 		"api_key": "34239840239849238098423",
@@ -128,9 +129,10 @@ or If False:
 
 Validates and Redeems promo voucher 
 
-#### /redeem
+#### /redeem/{id}
 
-* POST: Takes series of code data, validates and updates campaign voucher availability(auth admin or campaign who has {api_key})
+* POST: Takes series of code data, validates and updates campaign voucher availability(auth admin or campaign {id} who has {api_key})
+
 
     {
         "api_key": "34239840239849238098423",

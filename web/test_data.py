@@ -112,7 +112,7 @@ data_campaigns_codes_data = {
         'code': 'QWZ-EMD-ABCDEF',
         'friendly_code': 'FREESHIPPING',
         "description": "A friendly name of the code",
-        "status": "availiable",
+        "status": "available",
         "value_type": "fixed",
         "value_amount": 50.00,
         "value_currency": "ZAR",
@@ -194,6 +194,15 @@ data_redeem_percentage_bad = {
     'code_id': "uuid_2",
     'api_key': "thisandthat",
     "code": "ACT-EMD-ABCOSX",
+    "friendly_code": "FREESHIPPING",
+    "transaction_amount": 500.00,
+    "transaction_currency": "ZAR",
+}
+
+data_redeem_fixed_good = {
+    'code_id': "uuid_3",
+    'api_key': "thisandthat",
+    "code": "QWZ-EMD-ABCDEF",
     "friendly_code": "FREESHIPPING",
     "transaction_amount": 500.00,
     "transaction_currency": "ZAR",

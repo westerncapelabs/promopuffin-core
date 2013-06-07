@@ -13,7 +13,7 @@ parser.add_argument('transaction_amount', type=float, default=0)
 parser.add_argument('transaction_currency', type=unicode, default="ZAR")
 
 
-def redeem_data(data):
+def redeem_data(data, campaign_id):
     response = {
         "redeemed": False,
         "error": [],
@@ -26,6 +26,9 @@ def redeem_data(data):
 
     if code_data['status'] is not "available":
         response['error'].append("campaign is "+code_data['status'])
+
+    if code_data['campaign_id'] != campaign_id:
+        response['error'].append("code_id is not associated with campaign_id provided")
 
     if len(response['error']) == 0:
         response = {
@@ -47,8 +50,8 @@ def redeem_data(data):
 
 class Redeem(Resource):
     """ Validates code data """
-    # @shareddefs.campaigns_api_token_required
-    def post(self):
+    @shareddefs.campaigns_api_token_required
+    def post(self, campaign_id):
         args = parser.parse_args()
         data = {
             'code_id': args['code_id'],
@@ -60,7 +63,7 @@ class Redeem(Resource):
         }
         validation_response = main.validate.validate_data(data)
         if validation_response['valid'] is True:
-            response = redeem_data(data)
+            response = redeem_data(data, campaign_id)
             if response['redeemed'] is True:
                 return response, 201
             else:
@@ -69,4 +72,4 @@ class Redeem(Resource):
             return validation_response, 400  # bad request
 
 
-api.add_resource(Redeem, '/redeem')
+api.add_resource(Redeem, '/redeem/<string:campaign_id>')

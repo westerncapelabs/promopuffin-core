@@ -272,16 +272,24 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     """ Redeemed Tests """
     def test_redeem_percentage_success(self):
-        rv = self.app.post('/redeem', data=test_data.data_redeem_percentage_good)
-        print rv.data
+        rv = self.app.post('/redeem/uuid_1?auth=thisandthat', data=test_data.data_redeem_percentage_good)
+        assert rv.status_code == 201
+        assert "true" in rv.data
+
+    def test_redeem_percentage_success_admin_auth(self):
+        rv = self.app.post('/redeem/uuid_1?auth=somekey', data=test_data.data_redeem_percentage_good)
         assert rv.status_code == 201
         assert "true" in rv.data
 
     def test_redeem_percentage_fail(self):
-        rv = self.app.post('/redeem', data=test_data.data_redeem_percentage_bad)
-        print rv.data
+        rv = self.app.post('/redeem/uuid_2?auth=thisandthat', data=test_data.data_redeem_percentage_bad)
         assert rv.status_code == 400
         assert "false" in rv.data
+
+    def test_redeem_fixed_success(self):
+        rv = self.app.post('/redeem/uuid_3?auth=thisandthat', data=test_data.data_redeem_fixed_good)
+        assert rv.status_code == 201
+        assert "true" in rv.data
 
 
 if __name__ == '__main__':
