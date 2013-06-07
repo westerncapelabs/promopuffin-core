@@ -98,15 +98,14 @@ Need to supply code related data for validation.
 
 * POST: Takes a series of codes related variables and returns true/false
 
- 
 
     {
-        "code_id": "uuid" (used to locate code data),
-        "api_key": "34239840239849238098423",
-        "code": "ACT-CMP-ABCDE",
-        "friendly_code": "FREESHIPPING",
-        "transaction_amount": 500.00,
-        "transaction_currency": "ZAR",
+    	"code_id": "uuid" (used to locate code data),
+    	"api_key": "34239840239849238098423",
+    	"code": "ACT-CMP-ABCDE",
+    	"friendly_code": "FREESHIPPING",
+   	"transaction_amount": 500.00,
+    	"transaction_currency": "ZAR",
     }
 
 
