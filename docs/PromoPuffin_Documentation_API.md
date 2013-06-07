@@ -75,7 +75,7 @@ This is work-in-progress documention for promopuffin-core the API behind promopu
         "minimum": 250.00,
         "total": 50.00,
         "history": {} (collection of timestaps for redeemed vouchers),
-        "remaining":28.00,
+        "remaining": 28.00,
     }
 
 #### /campaigns/{id}/codes
@@ -97,7 +97,6 @@ Need to supply code related data for validation.
 #### /validate
 
 * POST: Takes a series of codes related variables and returns true/false
-
 
 	{
 		"code_id": "uuid" (used to locate code data),
@@ -132,8 +131,6 @@ Validates and Redeems promo voucher
 #### /redeem
 
 * POST: Takes series of code data, validates and updates campaign voucher availability(auth admin or campaign who has {api_key})
-
-
 
     {
         "api_key": "34239840239849238098423",
