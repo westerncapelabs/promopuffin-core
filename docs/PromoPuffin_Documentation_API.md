@@ -108,6 +108,7 @@ Need to supply code related data for validation.
         "transaction_currency": "ZAR",
     }
 
+
 Returns If True:
 
 	{
@@ -140,6 +141,7 @@ Validates and Redeems promo voucher
         "transaction_amount": 500.00,
         "transaction_currency": "ZAR",
     }
+
 
 Returns:
 
