@@ -30,12 +30,12 @@ This is work-in-progress documention for promopuffin-core the API behind promopu
 
 ### Campaigns /campaigns
 
-	"uuid_1" = {
-                name: "Friendly name",
-                start: YYYY-MM-DDTHH:MM:SS,
-                end: YYYY-MM-DDTHH:MM:SS,
-                account_id: "uuid",
-	}
+    "uuid_1" = {
+        name: "Friendly name",
+        start: YYYY-MM-DDTHH:MM:SS,
+        end: YYYY-MM-DDTHH:MM:SS,
+        account_id: "uuid",
+     }
 
 #### /campaigns
 
