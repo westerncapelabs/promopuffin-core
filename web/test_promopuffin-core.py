@@ -200,6 +200,8 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     def test_campaigns_campaign_put_no_data(self):
         rv = self.app.put('/campaigns/uuid_1?auth=somekey', data="")
+        assert "No name Specified" in rv.data
+        assert "No account_id specified" in rv.data
         assert rv.status_code == 400
 
     def test_campaigns_campaign_delete_not_authenticated(self):
@@ -219,6 +221,8 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     def test_campaigns_campaign_status_no_data(self):
         rv = self.app.post('/campaigns/uuid_1/status?auth=somekey', data="")
+        assert "No name Specified" in rv.data
+        assert "No account_id specified" in rv.data
         assert rv.status_code == 400
 
     def test_campaigns_campaign_status_no_campaign_id(self):
@@ -242,6 +246,11 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     def test_campaigns_campaign_codes_code_post_no_data(self):
         rv = self.app.post('campaigns/uuid_1/codes?auth=somekey', data="")
+        assert "No code specified" in rv.data
+        assert "No friendly_code specified" in rv.data
+        assert "No description specified" in rv.data
+        assert "No value_type specified" in rv.data
+        assert "No value_amount is <= 0" in rv.data
         assert rv.status_code == 400
 
     def test_campaigns_campaign_codes_post_not_authenticated(self):
@@ -296,6 +305,11 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     def test_campaigns_campaign_codes_put_no_data(self):
         rv = self.app.put('/campaigns/uuid_1/codes/uuid_1?auth=somekey', data="")
+        assert "No code specified" in rv.data
+        assert "No friendly_code specified" in rv.data
+        assert "No description specified" in rv.data
+        assert "No value_type specified" in rv.data
+        assert "No value_amount is <= 0" in rv.data
         assert rv.status_code == 400
 
     def test_campaigns_campaign_codes_no_campaign_id(self):
@@ -320,6 +334,7 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     def test_validate_no_data(self):
         rv = self.app.post('/validate', data="")
+        assert "Code None doesn't exist" in rv.data
         assert rv.status_code == 404
 
     """ Redeemed Tests """
@@ -350,6 +365,7 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     def test_redeem_no_data(self):
         rv = self.app.post('/redeem/uuid_1?auth=somekey', data="")
+        assert "Code None doesn't exist" in rv.data
         assert rv.status_code == 404
 
     def test_redeem_no_campaign_id(self):
