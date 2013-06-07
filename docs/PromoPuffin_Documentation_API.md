@@ -208,10 +208,6 @@ GET: Take q and scope values and search campaigns based on input (default limit 
 
 Need to supply code related data for validation.
 
-#### /validate
-
-* POST: Takes a series of codes related variables and returns true/false
-
         {
                 "code_id": "uuid" (used to locate code data),
                 "api_key": "34239840239849238098423",
@@ -220,6 +216,11 @@ Need to supply code related data for validation.
                 "transaction_amount": 500.00,
                 "transaction_currency": "ZAR",
         }
+
+#### /validate
+
+* POST: Takes a series of codes related variables and returns true/false
+       
 
 Returns If True:
 
@@ -241,10 +242,6 @@ or If False:
 
 Validates and Redeems promo voucher 
 
-#### /redeem
-
-* POST: Takes series of code data, validates and updates campaign voucher availability(auth admin or campaign who has {api_key})
-
         {
 		"api_key": "34239840239849238098423",
 		"code": "ACT-CMP-ABCDE",
@@ -253,6 +250,11 @@ Validates and Redeems promo voucher
 		"transaction_currency": "ZAR",
         }
 
+#### /redeem
+
+* POST: Takes series of code data, validates and updates campaign voucher availability(auth admin or campaign who has {api_key})
+
+        
 Returns:
 
         {
