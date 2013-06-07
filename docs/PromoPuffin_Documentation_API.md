@@ -97,6 +97,7 @@ Need to supply code related data for validation.
 #### /validate
 
 * POST: Takes a series of codes related variables and returns true/false
+
  
 
     {
@@ -132,6 +133,7 @@ Validates and Redeems promo voucher
 #### /redeem
 
 * POST: Takes series of code data, validates and updates campaign voucher availability(auth admin or campaign who has {api_key})
+
 
 
     {
