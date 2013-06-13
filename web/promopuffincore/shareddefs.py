@@ -6,6 +6,7 @@ import string
 import random  # for unique key gen
 import calendar
 import datetime
+import uuid
 from app import app
 
 
@@ -19,6 +20,10 @@ def unix_timestamp(fromdatetime=False):
 def appuuid():
     """ at the moment just returns a hex from uuid but maybe replaced but riak_id """
     return str(unix_timestamp()) + '-' + random.choice(string.ascii_letters) + random.choice(string.ascii_letters)
+
+
+def realuuid():
+    return uuid.uuid4().hex
 
 
 def accounts_api_token_required(f):

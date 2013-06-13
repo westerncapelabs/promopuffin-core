@@ -58,8 +58,8 @@ class Campaigns(Resource):
         if len(errors) > 0:
             return errors, 400
 
-        campaign_id = 'uuid_%d' % (len(campaigns_data) + 1)
-        # campaign_id = appuuid()
+        # campaign_id = 'uuid_%d' % (len(campaigns_data) + 1)
+        campaign_id = shareddefs.appuuid()
         campaigns_data[campaign_id] = {
             'name': args['name'],
             "start": args['start'],
