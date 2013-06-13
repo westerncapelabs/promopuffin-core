@@ -229,148 +229,148 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         rv = self.app.post('/campaigns/status?auth=somekey', data=test_data.data_campaigns_status_post_good)
         assert rv.status_code == 405  # method not allowed
 
-    """ Codes Tests """
-    def test_campaigns_campaign_codes_list(self):
-        rv = self.app.get('/campaigns/uuid_1/codes?auth=somekey')
-        assert "ACT-EKL-ABCDEF" in rv.data
+    # """ Codes Tests """
+    # def test_campaigns_campaign_codes_list(self):
+    #     rv = self.app.get('/campaigns/uuid_1/codes?auth=somekey')
+    #     assert "ACT-EKL-ABCDEF" in rv.data
 
-    def test_campaigns_campaign_codes_list_not_authenticated(self):
-        rv = self.app.post('/campaigns/uuid_1/codes?auth=some3432423f22key')
-        assert "Unauthorized" in rv.data
-        assert rv.status_code == 401
+    # def test_campaigns_campaign_codes_list_not_authenticated(self):
+    #     rv = self.app.post('/campaigns/uuid_1/codes?auth=some3432423f22key')
+    #     assert "Unauthorized" in rv.data
+    #     assert rv.status_code == 401
 
-    def test_campaigns_campaign_codes_add_new(self):
-        rv = self.app.post('/campaigns/uuid_1/codes?auth=somekey', data=test_data.data_campaigns_codes_post_good)
-        assert rv.status_code == 201
-        assert "ABC-DEF-GIJKLM" in rv.data
+    # def test_campaigns_campaign_codes_add_new(self):
+    #     rv = self.app.post('/campaigns/uuid_1/codes?auth=somekey', data=test_data.data_campaigns_codes_post_good)
+    #     assert rv.status_code == 201
+    #     assert "ABC-DEF-GIJKLM" in rv.data
 
-    def test_campaigns_campaign_codes_code_post_no_data(self):
-        rv = self.app.post('campaigns/uuid_1/codes?auth=somekey', data="")
-        assert "No code specified" in rv.data
-        assert "No friendly_code specified" in rv.data
-        assert "No description specified" in rv.data
-        assert "No value_type specified" in rv.data
-        assert "No value_amount is <= 0" in rv.data
-        assert rv.status_code == 400
+    # def test_campaigns_campaign_codes_code_post_no_data(self):
+    #     rv = self.app.post('campaigns/uuid_1/codes?auth=somekey', data="")
+    #     assert "No code specified" in rv.data
+    #     assert "No friendly_code specified" in rv.data
+    #     assert "No description specified" in rv.data
+    #     assert "No value_type specified" in rv.data
+    #     assert "No value_amount is <= 0" in rv.data
+    #     assert rv.status_code == 400
 
-    def test_campaigns_campaign_codes_post_not_authenticated(self):
-        rv = self.app.post('/campaigns/uuid_1/codes?auth=some3432423f22key', data=test_data.data_campaigns_codes_post_good)
-        assert "Unauthorized" in rv.data
-        assert rv.status_code == 401
+    # def test_campaigns_campaign_codes_post_not_authenticated(self):
+    #     rv = self.app.post('/campaigns/uuid_1/codes?auth=some3432423f22key', data=test_data.data_campaigns_codes_post_good)
+    #     assert "Unauthorized" in rv.data
+    #     assert rv.status_code == 401
 
-    def test_campaigns_campaign_codes_code_found(self):
-        rv = self.app.get('/campaigns/uuid_1/codes/uuid_1?auth=somekey')
-        assert rv.status_code == 200
-        assert "ACT-EKL-ABCDEF" in rv.data
+    # def test_campaigns_campaign_codes_code_found(self):
+    #     rv = self.app.get('/campaigns/uuid_1/codes/uuid_1?auth=somekey')
+    #     assert rv.status_code == 200
+    #     assert "ACT-EKL-ABCDEF" in rv.data
 
-    def test_campaigns_campaign_codes_code_found_not_authenticated(self):
-        rv = self.app.get('/campaigns/uuid_1/codes/uuid_1?auth=some3432423f22ke')
-        assert "Unauthorized" in rv.data
-        assert rv.status_code == 401
+    # def test_campaigns_campaign_codes_code_found_not_authenticated(self):
+    #     rv = self.app.get('/campaigns/uuid_1/codes/uuid_1?auth=some3432423f22ke')
+    #     assert "Unauthorized" in rv.data
+    #     assert rv.status_code == 401
 
-    def test_campaigns_campaign_codes_code_not_found(self):
-        rv = self.app.get('/campaigns/uuid_1/codes/uuid_34532errwr?auth=somekey')
-        assert rv.status_code == 404
+    # def test_campaigns_campaign_codes_code_not_found(self):
+    #     rv = self.app.get('/campaigns/uuid_1/codes/uuid_34532errwr?auth=somekey')
+    #     assert rv.status_code == 404
 
-    def test_campaigns_campaign_codes_code_delete_found(self):
-        rv = self.app.delete('/campaigns/uuid_1/codes/uuid_1?auth=somekey')
-        assert rv.status_code == 204
-        rv = self.app.get('/campaigns/uuid_1/codes/uuid_1?auth=somekey')
-        assert rv.status_code == 404
+    # def test_campaigns_campaign_codes_code_delete_found(self):
+    #     rv = self.app.delete('/campaigns/uuid_1/codes/uuid_1?auth=somekey')
+    #     assert rv.status_code == 204
+    #     rv = self.app.get('/campaigns/uuid_1/codes/uuid_1?auth=somekey')
+    #     assert rv.status_code == 404
 
-    def test_campaigns_campaign_codes_code_delete_not_authenticated(self):
-        rv = self.app.delete('/campaigns/uuid_1/codes/uuid_1?auth=some3432423f22key')
-        assert "Unauthorized" in rv.data
-        assert rv.status_code == 401
+    # def test_campaigns_campaign_codes_code_delete_not_authenticated(self):
+    #     rv = self.app.delete('/campaigns/uuid_1/codes/uuid_1?auth=some3432423f22key')
+    #     assert "Unauthorized" in rv.data
+    #     assert rv.status_code == 401
 
-    def test_campaigns_campaign_codes_code_delete_not_found(self):
-        rv = self.app.delete('/campaigns/uuid_1/codes/uuid_342dfs1?auth=somekey')
-        assert rv.status_code == 404
+    # def test_campaigns_campaign_codes_code_delete_not_found(self):
+    #     rv = self.app.delete('/campaigns/uuid_1/codes/uuid_342dfs1?auth=somekey')
+    #     assert rv.status_code == 404
 
-    def test_campaigns_campaign_codes_code_put_found(self):
-        rv = self.app.put('/campaigns/uuid_1/codes/uuid_1?auth=somekey', data=test_data.data_campaigns_codes_put_good)
-        assert rv.status_code == 201
-        rv = self.app.get('/campaigns/uuid_1/codes/uuid_1?auth=somekey')
-        assert rv.status_code == 200
-        assert "redeemed" in rv.data
+    # def test_campaigns_campaign_codes_code_put_found(self):
+    #     rv = self.app.put('/campaigns/uuid_1/codes/uuid_1?auth=somekey', data=test_data.data_campaigns_codes_put_good)
+    #     assert rv.status_code == 201
+    #     rv = self.app.get('/campaigns/uuid_1/codes/uuid_1?auth=somekey')
+    #     assert rv.status_code == 200
+    #     assert "redeemed" in rv.data
 
-    def test_campaigns_campaign_codes_code_put_not_authenticated(self):
-        rv = self.app.put('/campaigns/uuid_1/codes/uuid_1', data=test_data.data_campaigns_codes_put_good)
-        assert "Unauthorized" in rv.data
-        assert rv.status_code == 401
+    # def test_campaigns_campaign_codes_code_put_not_authenticated(self):
+    #     rv = self.app.put('/campaigns/uuid_1/codes/uuid_1', data=test_data.data_campaigns_codes_put_good)
+    #     assert "Unauthorized" in rv.data
+    #     assert rv.status_code == 401
 
-    def test_campaigns_campaign_codes_code_put_not_found(self):
-        rv = self.app.put('/campaigns/uuid_1/codes/uuid_432dfs341?auth=somekey', data=test_data.data_campaigns_codes_put_good)
-        assert rv.status_code == 404
+    # def test_campaigns_campaign_codes_code_put_not_found(self):
+    #     rv = self.app.put('/campaigns/uuid_1/codes/uuid_432dfs341?auth=somekey', data=test_data.data_campaigns_codes_put_good)
+    #     assert rv.status_code == 404
 
-    def test_campaigns_campaign_codes_put_no_data(self):
-        rv = self.app.put('/campaigns/uuid_1/codes/uuid_1?auth=somekey', data="")
-        assert "No code specified" in rv.data
-        assert "No friendly_code specified" in rv.data
-        assert "No description specified" in rv.data
-        assert "No value_type specified" in rv.data
-        assert "No value_amount is <= 0" in rv.data
-        assert rv.status_code == 400
+    # def test_campaigns_campaign_codes_put_no_data(self):
+    #     rv = self.app.put('/campaigns/uuid_1/codes/uuid_1?auth=somekey', data="")
+    #     assert "No code specified" in rv.data
+    #     assert "No friendly_code specified" in rv.data
+    #     assert "No description specified" in rv.data
+    #     assert "No value_type specified" in rv.data
+    #     assert "No value_amount is <= 0" in rv.data
+    #     assert rv.status_code == 400
 
-    def test_campaigns_campaign_codes_no_campaign_id(self):
-        rv = self.app.put('/campaigns/codes/uuid_1?auth=thisandthat', data=test_data.data_campaigns_codes_put_good)
-        assert rv.status_code == 404
+    # def test_campaigns_campaign_codes_no_campaign_id(self):
+    #     rv = self.app.put('/campaigns/codes/uuid_1?auth=thisandthat', data=test_data.data_campaigns_codes_put_good)
+    #     assert rv.status_code == 404
 
-    """ Validation Tests """
-    def test_validate_success_percentage(self):
-        rv = self.app.post('/validate', data=test_data.data_validation_post_percentage_good)
-        assert rv.status_code == 201
-        assert "true" in rv.data
+    # """ Validation Tests """
+    # def test_validate_success_percentage(self):
+    #     rv = self.app.post('/validate', data=test_data.data_validation_post_percentage_good)
+    #     assert rv.status_code == 201
+    #     assert "true" in rv.data
 
-    def test_validate_success_fixed(self):
-        rv = self.app.post('/validate', data=test_data.data_validation_post_fixed_good)
-        assert rv.status_code == 201
-        assert "true" in rv.data
+    # def test_validate_success_fixed(self):
+    #     rv = self.app.post('/validate', data=test_data.data_validation_post_fixed_good)
+    #     assert rv.status_code == 201
+    #     assert "true" in rv.data
 
-    def test_validate_fail(self):
-        rv = self.app.post('/validate', data=test_data.data_validation_post_bad)
-        assert rv.status_code == 400
-        assert "false" in rv.data
+    # def test_validate_fail(self):
+    #     rv = self.app.post('/validate', data=test_data.data_validation_post_bad)
+    #     assert rv.status_code == 400
+    #     assert "false" in rv.data
 
-    def test_validate_no_data(self):
-        rv = self.app.post('/validate', data="")
-        assert "Code None doesn't exist" in rv.data
-        assert rv.status_code == 404
+    # def test_validate_no_data(self):
+    #     rv = self.app.post('/validate', data="")
+    #     assert "Code None doesn't exist" in rv.data
+    #     assert rv.status_code == 404
 
-    """ Redeemed Tests """
-    def test_redeem_percentage_success(self):
-        rv = self.app.post('/redeem/uuid_1?auth=thisandthat', data=test_data.data_redeem_percentage_good)
-        assert rv.status_code == 201
-        assert "true" in rv.data
+    # """ Redeemed Tests """
+    # def test_redeem_percentage_success(self):
+    #     rv = self.app.post('/redeem/uuid_1?auth=thisandthat', data=test_data.data_redeem_percentage_good)
+    #     assert rv.status_code == 201
+    #     assert "true" in rv.data
 
-    def test_redeem_percentage_success_admin_auth(self):
-        rv = self.app.post('/redeem/uuid_1?auth=somekey', data=test_data.data_redeem_percentage_good)
-        assert rv.status_code == 201
-        assert "true" in rv.data
+    # def test_redeem_percentage_success_admin_auth(self):
+    #     rv = self.app.post('/redeem/uuid_1?auth=somekey', data=test_data.data_redeem_percentage_good)
+    #     assert rv.status_code == 201
+    #     assert "true" in rv.data
 
-    def test_redeem_percentage_fail(self):
-        rv = self.app.post('/redeem/uuid_2?auth=thisandthat', data=test_data.data_redeem_percentage_bad)
-        assert rv.status_code == 400
-        assert "false" in rv.data
+    # def test_redeem_percentage_fail(self):
+    #     rv = self.app.post('/redeem/uuid_2?auth=thisandthat', data=test_data.data_redeem_percentage_bad)
+    #     assert rv.status_code == 400
+    #     assert "false" in rv.data
 
-    def test_redeem_fixed_success(self):
-        rv = self.app.post('/redeem/uuid_3?auth=thisandthat', data=test_data.data_redeem_fixed_good)
-        assert rv.status_code == 201
-        assert "true" in rv.data
+    # def test_redeem_fixed_success(self):
+    #     rv = self.app.post('/redeem/uuid_3?auth=thisandthat', data=test_data.data_redeem_fixed_good)
+    #     assert rv.status_code == 201
+    #     assert "true" in rv.data
 
-    def test_redeem_auth_fail(self):
-        rv = self.app.post('/redeem/uuid_1?auth=dskfsld9', data=test_data.data_redeem_percentage_good)
-        assert rv.status_code == 401
-        assert "Unauthorized" in rv.data
+    # def test_redeem_auth_fail(self):
+    #     rv = self.app.post('/redeem/uuid_1?auth=dskfsld9', data=test_data.data_redeem_percentage_good)
+    #     assert rv.status_code == 401
+    #     assert "Unauthorized" in rv.data
 
-    def test_redeem_no_data(self):
-        rv = self.app.post('/redeem/uuid_1?auth=somekey', data="")
-        assert "Code None doesn't exist" in rv.data
-        assert rv.status_code == 404
+    # def test_redeem_no_data(self):
+    #     rv = self.app.post('/redeem/uuid_1?auth=somekey', data="")
+    #     assert "Code None doesn't exist" in rv.data
+    #     assert rv.status_code == 404
 
-    def test_redeem_no_campaign_id(self):
-        rv = self.app.post('/redeem?auth=somekey', data=test_data.data_redeem_percentage_good)
-        assert rv.status_code == 404
+    # def test_redeem_no_campaign_id(self):
+    #     rv = self.app.post('/redeem?auth=somekey', data=test_data.data_redeem_percentage_good)
+    #     assert rv.status_code == 404
 
 if __name__ == '__main__':
     unittest.main()

@@ -32,7 +32,8 @@ def accounts_api_token_required(f):
         token = request.args.get("auth", "")
         if 'account_id' in kwargs:
             main.accounts.abort_account_not_found(kwargs['account_id'])
-            if token == main.accounts.accounts_data[kwargs['account_id']]['api_key']:
+            # print main.accounts.accounts_data[kwargs['account_id']]
+            if token == main.accounts.accounts_data[kwargs['account_id']]["api_key"]:
                 pass
             elif token == app.config['PROMOPUFFIN_API_KEY']:
                 pass

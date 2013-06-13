@@ -25,6 +25,7 @@ accounts_data = {}
 parser = reqparse.RequestParser()
 parser.add_argument('username', type=unicode)
 parser.add_argument('password', type=unicode)
+parser.add_argument('api_key', type=unicode)
 
 
 def abort_account_not_found(account_id):
@@ -102,12 +103,11 @@ class Account(Resource):
         if len(errors) > 0:
             return errors, 400
 
-        account = {
-            'username': args['username'],
-            'password': args['password'],
-        }
         abort_account_not_found(account_id)
-        accounts_data[account_id] = account
+        account = accounts_data[account_id]
+        account['username'] = args['username']
+        account['password'] = args['password']
+
         return account, 201
 
 api.add_resource(Account, '/accounts/<string:account_id>')
