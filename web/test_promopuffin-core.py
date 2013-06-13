@@ -320,40 +320,40 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         assert "Code None doesn't exist" in rv.data
         assert rv.status_code == 404
 
-    # """ Redeemed Tests """
-    # def test_redeem_percentage_success(self):
-    #     rv = self.app.post('/redeem/uuid_1?auth=thisandthat', data=test_data.data_redeem_percentage_good)
-    #     assert rv.status_code == 201
-    #     assert "true" in rv.data
+    """ Redeemed Tests """
+    def test_redeem_percentage_success(self):
+        rv = self.app.post('/redeem/uuid_1?auth=thisandthat', data=test_data.data_redeem_percentage_good)
+        assert rv.status_code == 201
+        assert "true" in rv.data
 
-    # def test_redeem_percentage_success_admin_auth(self):
-    #     rv = self.app.post('/redeem/uuid_1?auth=somekey', data=test_data.data_redeem_percentage_good)
-    #     assert rv.status_code == 201
-    #     assert "true" in rv.data
+    def test_redeem_percentage_success_admin_auth(self):
+        rv = self.app.post('/redeem/uuid_1?auth=somekey', data=test_data.data_redeem_percentage_good)
+        assert rv.status_code == 201
+        assert "true" in rv.data
 
-    # def test_redeem_percentage_fail(self):
-    #     rv = self.app.post('/redeem/uuid_2?auth=thisandthat', data=test_data.data_redeem_percentage_bad)
-    #     assert rv.status_code == 400
-    #     assert "false" in rv.data
+    def test_redeem_percentage_fail(self):
+        rv = self.app.post('/redeem/uuid_2?auth=thisandthat', data=test_data.data_redeem_percentage_bad)
+        assert rv.status_code == 400
+        assert "false" in rv.data
 
-    # def test_redeem_fixed_success(self):
-    #     rv = self.app.post('/redeem/uuid_3?auth=thisandthat', data=test_data.data_redeem_fixed_good)
-    #     assert rv.status_code == 201
-    #     assert "true" in rv.data
+    def test_redeem_fixed_success(self):
+        rv = self.app.post('/redeem/uuid_3?auth=thisandthat', data=test_data.data_redeem_fixed_good)
+        assert rv.status_code == 201
+        assert "true" in rv.data
 
-    # def test_redeem_auth_fail(self):
-    #     rv = self.app.post('/redeem/uuid_1?auth=dskfsld9', data=test_data.data_redeem_percentage_good)
-    #     assert rv.status_code == 401
-    #     assert "Unauthorized" in rv.data
+    def test_redeem_auth_fail(self):
+        rv = self.app.post('/redeem/uuid_1?auth=dskfsld9', data=test_data.data_redeem_percentage_good)
+        assert rv.status_code == 401
+        assert "Unauthorized" in rv.data
 
-    # def test_redeem_no_data(self):
-    #     rv = self.app.post('/redeem/uuid_1?auth=somekey', data="")
-    #     assert "Code None doesn't exist" in rv.data
-    #     assert rv.status_code == 404
+    def test_redeem_no_data(self):
+        rv = self.app.post('/redeem/uuid_1?auth=somekey', data="")
+        assert "Code None doesn't exist" in rv.data
+        assert rv.status_code == 404
 
-    # def test_redeem_no_campaign_id(self):
-    #     rv = self.app.post('/redeem?auth=somekey', data=test_data.data_redeem_percentage_good)
-    #     assert rv.status_code == 404
+    def test_redeem_no_campaign_id(self):
+        rv = self.app.post('/redeem?auth=somekey', data=test_data.data_redeem_percentage_good)
+        assert rv.status_code == 404
 
 if __name__ == '__main__':
     unittest.main()
