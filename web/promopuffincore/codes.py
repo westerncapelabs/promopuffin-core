@@ -6,17 +6,16 @@ import shareddefs
 codes_data = {}
 
 parser = reqparse.RequestParser()
-parser.add_argument('code', type=unicode)
-parser.add_argument('friendly_code', type=unicode)
-parser.add_argument('description', type=unicode)
+parser.add_argument('code', required=True, type=unicode, case_sensitive=True)
+parser.add_argument('friendly_code', required=True, type=unicode, case_sensitive=True)
+parser.add_argument('description', required=True, type=unicode)
 parser.add_argument('status', type=unicode, default="unused")
-parser.add_argument('value_type', type=unicode)
-parser.add_argument('value_amount', type=float, default=0)
+parser.add_argument('value_type', required=True, type=unicode)
+parser.add_argument('value_amount', required=True, type=float, default=0)
 parser.add_argument('value_currency', type=unicode, default="ZAR")
-parser.add_argument('minimum', type=float, default=0)
-parser.add_argument('total', type=float, default=0)
-parser.add_argument('history', type=unicode)
-parser.add_argument('remaining', type=float, default=0)
+parser.add_argument('minimum', required=True, type=float, default=0)
+parser.add_argument('total', required=True, type=float, default=0)
+parser.add_argument('remaining', required=True, type=float, default=0)
 
 
 def abort_code_not_found(code_id):
@@ -45,40 +44,28 @@ def set_data(code_id, data):
 
 def validate_new_codes_data(args):
     errors = []
-    if args['code'] is None:
-        errors.append("No code specified")
-
-    if args['friendly_code'] is None:
-        errors.append("No friendly_code specified")
-
-    if args['description'] is None:
-        errors.append("No description specified")
-
-    if args['status'] is None:
-        errors.append("No status specified")
-
-    if args['value_type'] is None:
-        errors.append("No value_type specified")
-
-    if args['value_amount'] <= 0:
-        errors.append("No value_amount is <= 0")
-
-    if args['value_currency'] is None:
-        errors.append("No value_currency specified")
+    if args['value_amount'] < 0:
+        errors.append("value_amount is < 0")
 
     if args['minimum'] < 0:
-        errors.append("No minimum < 0")
+        errors.append("minimum < 0")
 
     if args['total'] < 0:
-        errors.append("No total < 0")
+        errors.append("total < 0")
 
     if args['remaining'] > args['total']:
-        errors.append("No remaining > total")
+        errors.append("Number of remaining > total")
 
     if args['remaining'] < 0:
-        errors.append("No remaining < 0")
+        errors.append("remaining < 0")
 
     return errors
+
+
+def add_to_history(code_id, history_msg):
+    abort_code_not_found(code_id)
+    code = codes_data[code_id]
+    code['history_msg'].append(history_msg)
 
 
 class Codes(Resource):
@@ -110,9 +97,10 @@ class Codes(Resource):
             "value_currency": args['value_currency'],
             "minimum": args['minimum'],
             "total": args['total'],
-            "history": [],
+            "history_msg": [],
             "remaining": args['remaining'],
         }
+        codes_data[code_id]["history_msg"].append("Initialised on:" + str(shareddefs.unix_timestamp()))
         return codes_data[code_id], 201
 
 api.add_resource(Codes, '/campaigns/<string:campaign_id>/codes')
@@ -147,7 +135,7 @@ class Code(Resource):
         code["value_currency"] = args['value_currency']
         code["minimum"] = args['minimum']
         code["total"] = args['total']
-        code["history"] = args['history']
+        code['history_msg'].append("Updated on: " + str(shareddefs.unix_timestamp()))
         code["remaining"] = args['remaining']
 
         codes_data[code_id] = code

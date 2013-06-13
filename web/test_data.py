@@ -96,7 +96,7 @@ data_campaigns_codes_data = {
         "minimum": 250.00,
         "minimum_currency": "ZAR",
         "total": 50.00,
-        "history": [],
+        "history_msg": [],
         "remaining": 28.00,
     },
     "uuid_2": {
@@ -111,7 +111,7 @@ data_campaigns_codes_data = {
         "minimum": 250.00,
         "minimum_currency": "ZAR",
         "total": 50.00,
-        "history": [],
+        "history_msg": [],
         "remaining": 0.00,
     },
     "uuid_3": {
@@ -126,7 +126,7 @@ data_campaigns_codes_data = {
         "minimum": 250.00,
         "minimum_currency": "ZAR",
         "total": 50.00,
-        "history": [],
+        "history_msg": [],
         "remaining": 28.00,
     },
 }
