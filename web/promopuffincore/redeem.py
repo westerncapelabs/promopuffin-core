@@ -39,7 +39,7 @@ def redeem_data(data, campaign_id):
         }
 
         # redeem code
-        code_data['history'].append(shareddefs.appuuid())
+        code_data['history_msg'].append("Redeemed: " + str(shareddefs.appuuid()))
         code_data['remaining'] -= 1
         if code_data['remaining'] == 0:
             code_data['status'] = "redeemed"

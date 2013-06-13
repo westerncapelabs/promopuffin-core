@@ -322,12 +322,12 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     """ Redeemed Tests """
     def test_redeem_percentage_success(self):
-        rv = self.app.post('/redeem/uuid_1?auth=thisandthat', data=test_data.data_redeem_percentage_good)
+        rv = self.app.post('/redeem/uuid_3?auth=thisandthat', data=test_data.data_redeem_percentage_good)
         assert rv.status_code == 201
         assert "true" in rv.data
 
     def test_redeem_percentage_success_admin_auth(self):
-        rv = self.app.post('/redeem/uuid_1?auth=somekey', data=test_data.data_redeem_percentage_good)
+        rv = self.app.post('/redeem/uuid_3?auth=somekey', data=test_data.data_redeem_percentage_good)
         assert rv.status_code == 201
         assert "true" in rv.data
 
