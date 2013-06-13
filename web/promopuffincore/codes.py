@@ -62,7 +62,7 @@ def validate_new_codes_data(args):
     return errors
 
 
-def add_to_history(code_id, history_msg):
+def append_to_history(code_id, history_msg):
     abort_code_not_found(code_id)
     code = codes_data[code_id]
     code['history_msg'].append(history_msg)
