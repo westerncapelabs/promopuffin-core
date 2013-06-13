@@ -15,6 +15,7 @@ parser.add_argument('value_amount', required=True, type=float, default=0)
 parser.add_argument('value_currency', type=unicode, default="ZAR")
 parser.add_argument('minimum', required=True, type=float, default=0)
 parser.add_argument('total', required=True, type=float, default=0)
+parser.add_argument('history_msg', type=unicode)
 parser.add_argument('remaining', required=True, type=float, default=0)
 
 
@@ -100,7 +101,7 @@ class Codes(Resource):
             "history_msg": [],
             "remaining": args['remaining'],
         }
-        codes_data[code_id]["history_msg"].append("Initialised on:" + str(shareddefs.unix_timestamp()))
+        codes_data[code_id]["history_msg"].append("Initialised on:" + unicode(shareddefs.unix_timestamp()))
         return codes_data[code_id], 201
 
 api.add_resource(Codes, '/campaigns/<string:campaign_id>/codes')
@@ -135,7 +136,10 @@ class Code(Resource):
         code["value_currency"] = args['value_currency']
         code["minimum"] = args['minimum']
         code["total"] = args['total']
-        code['history_msg'].append("Updated on: " + str(shareddefs.unix_timestamp()))
+        if "history_msg" in args:
+            code['history_msg'].append(args['history_msg'])
+        else:
+            code['history_msg'].append("Updated: " + unicode(shareddefs.unix_timestamp()))
         code["remaining"] = args['remaining']
 
         codes_data[code_id] = code
