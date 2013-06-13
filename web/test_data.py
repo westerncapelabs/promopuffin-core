@@ -162,9 +162,9 @@ data_campaigns_codes_put_good = {
 }
 
 data_validation_post_percentage_good = {
-    'code_id': "uuid_1",
+    'code_id': "uuid_3",
     'api_key': "thisandthat",
-    "code": "ACT-EKL-ABCDEF",
+    "code": "QWZ-EMD-ABCDEF",
     "friendly_code": "FREESHIPPING",
     "transaction_amount": 500.00,
     "transaction_currency": "ZAR",

@@ -299,26 +299,26 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         rv = self.app.put('/campaigns/codes/uuid_1?auth=thisandthat', data=test_data.data_campaigns_codes_put_good)
         assert rv.status_code == 404
 
-    # """ Validation Tests """
-    # def test_validate_success_percentage(self):
-    #     rv = self.app.post('/validate', data=test_data.data_validation_post_percentage_good)
-    #     assert rv.status_code == 201
-    #     assert "true" in rv.data
+    """ Validation Tests """
+    def test_validate_success_percentage(self):
+        rv = self.app.post('/validate', data=test_data.data_validation_post_percentage_good)
+        assert rv.status_code == 201
+        assert "true" in rv.data
 
-    # def test_validate_success_fixed(self):
-    #     rv = self.app.post('/validate', data=test_data.data_validation_post_fixed_good)
-    #     assert rv.status_code == 201
-    #     assert "true" in rv.data
+    def test_validate_success_fixed(self):
+        rv = self.app.post('/validate', data=test_data.data_validation_post_fixed_good)
+        assert rv.status_code == 201
+        assert "true" in rv.data
 
-    # def test_validate_fail(self):
-    #     rv = self.app.post('/validate', data=test_data.data_validation_post_bad)
-    #     assert rv.status_code == 400
-    #     assert "false" in rv.data
+    def test_validate_fail(self):
+        rv = self.app.post('/validate', data=test_data.data_validation_post_bad)
+        assert rv.status_code == 400
+        assert "false" in rv.data
 
-    # def test_validate_no_data(self):
-    #     rv = self.app.post('/validate', data="")
-    #     assert "Code None doesn't exist" in rv.data
-    #     assert rv.status_code == 404
+    def test_validate_no_data(self):
+        rv = self.app.post('/validate', data="")
+        assert "Code None doesn't exist" in rv.data
+        assert rv.status_code == 404
 
     # """ Redeemed Tests """
     # def test_redeem_percentage_success(self):
