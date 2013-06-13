@@ -175,8 +175,6 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     def test_campaigns_campaign_post_no_data(self):
         rv = self.app.post('/campaigns?auth=somekey', data="")
-        assert "No name Specified" in rv.data
-        assert "No account_id specified" in rv.data
         assert rv.status_code == 400
 
     def test_campaigns_campaign_get_not_authenticated(self):
@@ -195,8 +193,6 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     def test_campaigns_campaign_put_no_data(self):
         rv = self.app.put('/campaigns/uuid_1?auth=somekey', data="")
-        assert "No name Specified" in rv.data
-        assert "No account_id specified" in rv.data
         assert rv.status_code == 400
 
     def test_campaigns_campaign_delete_not_authenticated(self):
@@ -216,8 +212,6 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     def test_campaigns_campaign_status_no_data(self):
         rv = self.app.post('/campaigns/uuid_1/status?auth=somekey', data="")
-        assert "No name Specified" in rv.data
-        assert "No account_id specified" in rv.data
         assert rv.status_code == 400
 
     def test_campaigns_campaign_status_no_campaign_id(self):
