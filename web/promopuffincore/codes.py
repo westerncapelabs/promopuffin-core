@@ -134,21 +134,22 @@ class Code(Resource):
         if len(errors) > 0:
             return errors, 400
 
-        code = {
-            'campaign_id': campaign_id,
-            'code': args['code'],
-            'friendly_code': args['friendly_code'],
-            "description": args['description'],
-            "status": args['status'],
-            "value_type": args['value_type'],
-            "value_amount": args['value_amount'],
-            "value_currency": args['value_currency'],
-            "minimum": args['minimum'],
-            "total": args['total'],
-            "history": args['history'],
-            "remaining": args['remaining'],
-        }
         abort_code_not_found(code_id)
+        code = codes_data[code_id]
+
+        code['campaign_id'] = campaign_id
+        code['code'] = args['code']
+        code['friendly_code'] = args['friendly_code']
+        code["description"] = args['description']
+        code["status"] = args['status']
+        code["value_type"] = args['value_type']
+        code["value_amount"] = args['value_amount']
+        code["value_currency"] = args['value_currency']
+        code["minimum"] = args['minimum']
+        code["total"] = args['total']
+        code["history"] = args['history']
+        code["remaining"] = args['remaining']
+
         codes_data[code_id] = code
         return code, 201
 
