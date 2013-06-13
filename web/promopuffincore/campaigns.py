@@ -7,11 +7,11 @@ import shareddefs
 campaigns_data = {}
 
 parser = reqparse.RequestParser()
-parser.add_argument('name', type=unicode)
-parser.add_argument('start', type=unicode, default=''+datetime.utcnow().isoformat())
-parser.add_argument('end', type=unicode, default=''+datetime.utcnow().isoformat())
+parser.add_argument('name', required=True, type=unicode, case_sensitive=True)
+parser.add_argument('start', required=True, type=unicode, default=''+datetime.utcnow().isoformat())
+parser.add_argument('end', required=True, type=unicode, default=''+datetime.utcnow().isoformat())
 parser.add_argument('status', type=unicode, default="pending")
-parser.add_argument('account_id', type=unicode)
+parser.add_argument('account_id', required=True, type=unicode, case_sensitive=True)
 
 
 def abort_campaign_not_found(campaign_id):
@@ -25,23 +25,6 @@ def get_data(campaign_id):
     return dict(campaigns_data[campaign_id])
 
 
-def validate_campaign_status_data(args):
-    errors = []
-    if args['name'] is None:
-        errors.append('No name Specified')
-
-    if args['start'] > args['end']:
-        errors.append("Start datetime starts after end datetime")
-
-    if args['status'] is None:
-        errors.append("No status specified")
-
-    if args['account_id'] is None:
-        errors.append("No account_id specified")
-
-    return errors
-
-
 class Campaigns(Resource):
     @shareddefs.campaigns_api_token_required
     def get(self):
@@ -53,10 +36,9 @@ class Campaigns(Resource):
         """ saves a new campaign """
         args = parser.parse_args()
 
-        # validate input data
-        errors = validate_campaign_status_data(args)
-        if len(errors) > 0:
-            return errors, 400
+        # validate dates
+        if args['start'] > args['end']:
+            return "Start datetime starts after end datetime", 400
 
         # campaign_id = 'uuid_%d' % (len(campaigns_data) + 1)
         campaign_id = shareddefs.appuuid()
@@ -96,10 +78,9 @@ class Campaign(Resource):
     def put(self, campaign_id):
         args = parser.parse_args()
 
-        # validate input data
-        errors = validate_campaign_status_data(args)
-        if len(errors) > 0:
-            return errors, 400
+        # validate dates
+        if args['start'] > args['end']:
+            return "Start datetime starts after end datetime", 400
 
         abort_campaign_not_found(campaign_id)
         campaign = campaigns_data[campaign_id]
@@ -128,11 +109,6 @@ class CampaignStatus(Resource):
     @shareddefs.campaigns_api_token_required
     def post(self, campaign_id):
         args = parser.parse_args()
-
-        # validate input data
-        errors = validate_campaign_status_data(args)
-        if len(errors) > 0:
-            return errors, 400
 
         """request status change to pending,running,halted"""
         abort_campaign_not_found(campaign_id)
