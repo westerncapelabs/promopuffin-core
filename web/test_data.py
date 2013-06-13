@@ -51,13 +51,13 @@ data_campaigns_data = {
         "name": "Campaign1",
         "start": "2013-05-21T19:12:04.781440",
         "end": "2013-05-21T19:12:04.781462",
-        "status": "running",
         "account_id": "uuid_1",
     },
     "uuid_2": {
         "name": "Campaign2",
         "start": "2013-05-21T19:12:04.781440",
         "end": "2013-05-21T19:12:04.781462",
+        "status": "running",
         "account_id": "uuid_2",
     },
     "uuid_3": {

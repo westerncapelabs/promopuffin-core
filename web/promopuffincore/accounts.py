@@ -83,6 +83,8 @@ class Account(Resource):
         account['username'] = args['username']
         account['password'] = args['password']
 
+        accounts_data[account_id] = account
+
         return account, 201
 
 api.add_resource(Account, '/accounts/<string:account_id>')

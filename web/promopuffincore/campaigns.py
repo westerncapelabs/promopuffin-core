@@ -101,15 +101,17 @@ class Campaign(Resource):
         if len(errors) > 0:
             return errors, 400
 
-        campaign = {
-            'name': args['name'],
-            "start": args['start'],
-            "end": args['end'],
-            'status': args['status'],
-            'account_id': args['account_id'],
-        }
         abort_campaign_not_found(campaign_id)
+        campaign = campaigns_data[campaign_id]
+
+        campaign['name'] = args['name']
+        campaign["start"] = args['start']
+        campaign["end"] = args['end']
+        campaign['status'] = args['status']
+        campaign['account_id'] = args['account_id']
+
         campaigns_data[campaign_id] = campaign
+
         return campaign, 201
 
 api.add_resource(Campaign, '/campaigns/<string:campaign_id>')

@@ -108,7 +108,7 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
     """ Campaigns Tests """
     def test_campaigns_list(self):
         rv = self.app.get('/campaigns?auth=somekey')
-        assert "Campaign1" in rv.data
+        assert "Campaign3" in rv.data
 
     def test_campaigns_add_new(self):
         rv = self.app.post("/campaigns?auth=somekey", data=test_data.data_campaigns_post_good)
@@ -146,7 +146,7 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         assert rv.status_code == 404
 
     def test_campaigns_campaign_status_list_found(self):
-        rv = self.app.get('/campaigns/uuid_1/status?auth=somekey')
+        rv = self.app.get('/campaigns/uuid_2/status?auth=somekey')
         assert rv.status_code == 200
         assert "running" in rv.data
 
