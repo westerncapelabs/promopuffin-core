@@ -8,5 +8,3 @@ from flask.ext import restful
 app = Flask(__name__)
 app.config.from_object('promopuffincore.config.Configuration')
 api = restful.Api(app)
-
-# db = Database(app)

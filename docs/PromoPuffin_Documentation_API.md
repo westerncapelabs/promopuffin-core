@@ -10,7 +10,7 @@ This is work-in-progress documention for promopuffin-core the API behind promopu
     "uuid_1" = {
         username: "email@example.org",
         password: "BCRYPT_value",
-        api_key: "UUID"
+        api_key: "some_key"
     }
 
 #### /accounts	
@@ -63,7 +63,7 @@ This is work-in-progress documention for promopuffin-core the API behind promopu
 
 ### Codes /campaigns/{id}/codes
 
-    {
+   "uuid_1" =  {
         "campaign_id": "uuid" (link to campaign),
         "code": "ACT-CMP-ABCDE" (unique sys-wide),
         "friendly_code": "FREESHIPPING" (unique in campaign)
