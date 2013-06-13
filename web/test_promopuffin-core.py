@@ -218,6 +218,10 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         rv = self.app.post('/campaigns/status?auth=somekey', data=test_data.data_campaigns_status_post_good)
         assert rv.status_code == 405  # method not allowed
 
+    def test_campaigns_campaign_put_bad(self):
+        rv = self.app.put('/campaigns/uuid_1?auth=somekey', data=test_data.data_campaigns_put_bad)
+        assert "Start datetime starts after end datetime" in rv.data
+
     # """ Codes Tests """
     # def test_campaigns_campaign_codes_list(self):
     #     rv = self.app.get('/campaigns/uuid_1/codes?auth=somekey')

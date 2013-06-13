@@ -46,6 +46,13 @@ data_campaigns_put_good = {
     "account_id": "uuid_1",
 }
 
+data_campaigns_put_bad = {
+    "name": "OneTheWayCampaign",
+    "start": "2013-05-21T19:12:04.781440",
+    "end": "2013-04-21T19:12:04.781462",
+    "account_id": "uuid_1",
+}
+
 data_campaigns_data = {
     "uuid_1": {
         "name": "Campaign1",
