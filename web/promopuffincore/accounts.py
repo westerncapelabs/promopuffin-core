@@ -23,9 +23,8 @@ accounts_data = {}
 # }
 
 parser = reqparse.RequestParser()
-parser.add_argument('username', type=unicode)
-parser.add_argument('password', type=unicode)
-parser.add_argument('api_key', type=unicode)
+parser.add_argument('username', required=True, type=unicode)
+parser.add_argument('password', required=True, type=unicode)
 
 
 def abort_account_not_found(account_id):
@@ -39,20 +38,6 @@ def get_data(account_id):
     return dict(accounts_data[account_id])
 
 
-def validate_accounts_data(args):
-    errors = []
-    if args['username'] is None:
-        errors.append("No username specified")
-
-    if args['password'] is None:
-        errors.append("No password specified")
-
-    if args['api_key'] is None:
-        errors.append("No api_key specified")
-
-    return errors
-
-
 class Accounts(Resource):
     @shareddefs.accounts_api_token_required
     def get(self):
@@ -63,11 +48,6 @@ class Accounts(Resource):
     def post(self):
         """ saves a new account """
         args = parser.parse_args()
-
-        # validate input data
-        errors = validate_accounts_data(args)
-        if len(errors) > 0:
-            return errors, 400
 
         account_id = shareddefs.appuuid()
         accounts_data[account_id] = {
@@ -97,11 +77,6 @@ class Account(Resource):
     @shareddefs.accounts_api_token_required
     def put(self, account_id):
         args = parser.parse_args()
-
-        # validate input data
-        errors = validate_accounts_data(args)
-        if len(errors) > 0:
-            return errors, 400
 
         abort_account_not_found(account_id)
         account = accounts_data[account_id]

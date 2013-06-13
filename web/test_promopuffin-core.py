@@ -62,6 +62,7 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     def test_accounts_account_put_found(self):
         rv = self.app.put('/accounts/uuid_1?auth=somekey', data=test_data.data_accounts_put_good)
+        # print rv.data
         assert rv.status_code == 201
         rv = self.app.get('/accounts/uuid_1?auth=somekey')
         assert rv.status_code == 200
@@ -83,9 +84,6 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     def test_accounts_account_post_no_data(self):
         rv = self.app.post('/accounts?auth=somekey', data="")
-        assert "No username specified" in rv.data
-        assert "No password specified" in rv.data
-        assert "No api_key specified" in rv.data
         assert rv.status_code == 400
 
     def test_accounts_account_get_not_authenticated(self):
@@ -105,9 +103,6 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     def test_accounts_account_put_no_data(self):
         rv = self.app.put('/accounts/uuid_1?auth=thisandthat', data="")
-        assert "No username specified" in rv.data
-        assert "No password specified" in rv.data
-        assert "No api_key specified" in rv.data
         assert rv.status_code == 400
 
     """ Campaigns Tests """

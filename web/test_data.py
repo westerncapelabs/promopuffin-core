@@ -9,7 +9,7 @@ data_accounts_post_good = {
 }
 
 data_accounts_put_good = {
-    "api_key": data_auth_admin,
+    # "api_key": data_auth_admin,
     "username": "user1@example.com",
     "password": "testweak"
 }
