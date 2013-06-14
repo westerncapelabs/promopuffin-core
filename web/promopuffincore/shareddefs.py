@@ -114,8 +114,7 @@ def bucket_item_load(bucket_name, key):
     """ Loads the product from db and returns the resulting object """
     bucket_data = g.rc.bucket(app.config['RIAK_BUCKET_PREFIX'] + bucket_name)
     product = bucket_data.get(key)  # always run product_exists first
-    details = product.get_data()  # What???
-    return True
+    return product.get_data()
 
 
 def bucket_item_delete(bucket_name, key, removevariants=False, removeimages=False):
@@ -129,6 +128,5 @@ def bucket_item_delete(bucket_name, key, removevariants=False, removeimages=Fals
 
 
 def get_bucket_list(bucket_name):
-    bucket_data = g.rc.bucket(
-        app.config['RIAK_BUCKET_PREFIX'] + bucket_name).get_keys()
+    bucket_data = g.rc.bucket(app.config['RIAK_BUCKET_PREFIX'] + bucket_name).get_keys()
     return bucket_data
