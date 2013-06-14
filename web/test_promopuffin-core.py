@@ -1,6 +1,7 @@
 import unittest
 from promopuffincore import main, accounts, campaigns, codes
 import test_data
+import json
 
 
 class PromoPuffinCoreTestCase(unittest.TestCase):
@@ -33,6 +34,32 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         assert 'Hello World!' in rv.data  # Should be the <title> of the page
 
     """ Accounts Tests """
+    def test_accounts_account_login_success(self):
+        rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_login_good)
+        account_data = json.loads(rv.data)
+        data = test_data.data_accounts_login_good
+        data['account_id'] = account_data['account_id']
+        rv = self.app.post('/accounts/login', data=data)
+        assert rv.status_code == 201
+
+    def test_accounts_account_login_fail(self):
+        rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_login_good)
+        account_data = json.loads(rv.data)
+        data = test_data.data_accounts_login_bad
+        data['account_id'] = account_data['account_id']
+        rv = self.app.post('/accounts/login', data=data)
+        assert rv.status_code == 401
+        assert "Unauthorized: Incorrect username and password match" in rv.data
+
+    def test_accounts_account_login_no_data(self):
+        rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_login_good)
+        account_data = json.loads(rv.data)
+        data = {
+            'account_id': account_data['account_id'],
+        }
+        rv = self.app.post('/accounts/login', data=data)
+        assert rv.status_code == 400
+
     def test_accounts_list(self):
         rv = self.app.get('/accounts?auth=somekey')
         assert "user1@example.com" in rv.data
