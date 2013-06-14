@@ -95,9 +95,9 @@ data_campaigns_codes_data = {
         "value_currency": "ZAR",
         "minimum": 250.00,
         "minimum_currency": "ZAR",
-        "total": 50.00,
+        "total": 50,
         "history_msg": [],
-        "remaining": 28.00,
+        "remaining": 28,
     },
     "uuid_2": {
         'campaign_id': 'uuid_2',
@@ -110,9 +110,9 @@ data_campaigns_codes_data = {
         "value_currency": "ZAR",
         "minimum": 250.00,
         "minimum_currency": "ZAR",
-        "total": 50.00,
+        "total": 50,
         "history_msg": [],
-        "remaining": 0.00,
+        "remaining": 0,
     },
     "uuid_3": {
         'campaign_id': 'uuid_3',
@@ -125,9 +125,9 @@ data_campaigns_codes_data = {
         "value_currency": "ZAR",
         "minimum": 250.00,
         "minimum_currency": "ZAR",
-        "total": 50.00,
+        "total": 50,
         "history_msg": [],
-        "remaining": 28.00,
+        "remaining": 28,
     },
 }
 
@@ -142,8 +142,8 @@ data_campaigns_codes_post_good = {
     "value_currency": "ZAR",
     "minimum": 250.00,
     "minimum_currency": "ZAR",
-    "total": 50.00,
-    "remaining": 28.00,
+    "total": 50,
+    "remaining": 28,
 }
 
 data_campaigns_codes_put_good = {
@@ -157,8 +157,8 @@ data_campaigns_codes_put_good = {
     "value_currency": "ZAR",
     "minimum": 250.00,
     "minimum_currency": "ZAR",
-    "total": 50.00,
-    "remaining": 28.00,
+    "total": 50,
+    "remaining": 28,
 }
 
 data_validation_post_percentage_good = {

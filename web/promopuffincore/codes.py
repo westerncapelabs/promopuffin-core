@@ -15,9 +15,9 @@ parser.add_argument('value_type', required=True, type=unicode)
 parser.add_argument('value_amount', required=True, type=float, default=0)
 parser.add_argument('value_currency', type=unicode, default=main.app.config['CURRENCY'])
 parser.add_argument('minimum', required=True, type=float, default=0)
-parser.add_argument('total', required=True, type=float, default=0)
+parser.add_argument('total', required=True, type=int, default=0)
 parser.add_argument('history_msg', type=unicode)
-parser.add_argument('remaining', required=True, type=float, default=0)
+parser.add_argument('remaining', required=True, type=int, default=0)
 
 
 def abort_code_not_found(code_id):
