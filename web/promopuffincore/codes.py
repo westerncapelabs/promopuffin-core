@@ -48,19 +48,19 @@ def set_data(code_id, data):
 def validate_new_codes_data(args):
     errors = []
     if args['value_amount'] < 0:
-        errors.append("value_amount is < 0")
+        errors.append("value_amount is less than 0")
 
     if args['minimum'] < 0:
-        errors.append("minimum < 0")
+        errors.append("minimum is less than 0")
 
     if args['total'] < 0:
-        errors.append("total < 0")
+        errors.append("total is less than 0")
 
     if args['remaining'] > args['total']:
-        errors.append("Number of remaining > total")
+        errors.append("Number of remaining is greater than total")
 
     if args['remaining'] < 0:
-        errors.append("remaining < 0")
+        errors.append("remaining is less than 0")
 
     return errors
 
