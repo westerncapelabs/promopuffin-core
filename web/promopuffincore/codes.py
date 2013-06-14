@@ -1,4 +1,5 @@
 from flask.ext.restful import reqparse, Resource, abort
+import main
 from app import api
 
 import shareddefs
@@ -12,7 +13,7 @@ parser.add_argument('description', required=True, type=unicode)
 parser.add_argument('status', type=unicode, default="unused")
 parser.add_argument('value_type', required=True, type=unicode)
 parser.add_argument('value_amount', required=True, type=float, default=0)
-parser.add_argument('value_currency', type=unicode, default="ZAR")
+parser.add_argument('value_currency', type=unicode, default=main.app.config['CURRENCY'])
 parser.add_argument('minimum', required=True, type=float, default=0)
 parser.add_argument('total', required=True, type=float, default=0)
 parser.add_argument('history_msg', type=unicode)
