@@ -30,6 +30,7 @@ def redeem_data(data, campaign_id):
     if code_data['campaign_id'] != campaign_id:
         response['error'].append("code_id is not associated with campaign_id provided")
 
+    write_success = False
     if len(response['error']) == 0:
         response = {
             "redeemed": True,
@@ -43,9 +44,13 @@ def redeem_data(data, campaign_id):
         code_data['remaining'] -= 1
         if code_data['remaining'] == 0:
             code_data['status'] = "redeemed"
-        main.codes.set_data(data['code_id'], code_data)  # updates campaign codes_data
+        write_success = main.codes.set_data(data['code_id'], code_data)
 
-    return response
+    if write_success is True:  # updates campaign codes_data
+        return response
+    else:
+        response['redeemed'] = False
+        return response
 
 
 class Redeem(Resource):

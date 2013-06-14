@@ -41,6 +41,7 @@ def get_data(code_id):
 def set_data(code_id, data):
     abort_code_not_found(code_id)
     codes_data[code_id] = data
+    return True
 
 
 def validate_new_codes_data(args):

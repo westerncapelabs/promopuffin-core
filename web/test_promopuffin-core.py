@@ -62,7 +62,6 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     def test_accounts_account_put_found(self):
         rv = self.app.put('/accounts/uuid_1?auth=somekey', data=test_data.data_accounts_put_good)
-        # print rv.data
         assert rv.status_code == 201
         rv = self.app.get('/accounts/uuid_1?auth=somekey')
         assert rv.status_code == 200

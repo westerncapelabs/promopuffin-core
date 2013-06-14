@@ -1,3 +1,4 @@
+from flask import g
 from flask.ext.restful import reqparse, Resource, abort
 from app import api
 import shareddefs
@@ -52,7 +53,7 @@ class Accounts(Resource):
         account_id = shareddefs.appuuid()
         accounts_data[account_id] = {
             'username': args['username'],
-            'password': args['password'],
+            'password': g.bcrypt.generate_password_hash(args['password']),
             "api_key": shareddefs.appuuid(),
         }
         return accounts_data[account_id], 201
@@ -81,7 +82,7 @@ class Account(Resource):
         abort_account_not_found(account_id)
         account = accounts_data[account_id]
         account['username'] = args['username']
-        account['password'] = args['password']
+        account['password'] = g.bcrypt.generate_password_hash(args['password'])
 
         accounts_data[account_id] = account
 
