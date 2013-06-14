@@ -1,4 +1,4 @@
-from flask import request, abort
+from flask import g, request, abort
 from functools import wraps
 import main
 
@@ -66,3 +66,69 @@ def campaigns_api_token_required(f):
             abort(401)
         return f(*args, **kwargs)
     return decorated_function
+
+###################################
+# DB related helper functions {TODO}
+###################################
+
+
+def item_exists(bucket_name, key):
+    """ Check product exists - return True/False """
+    bucket_data = g.rc.bucket(app.config['RIAK_BUCKET_PREFIX'] + bucket_name)
+    return bucket_data.get(key).exists()
+
+
+def db_store(bucket_name, value, key=False):
+    """ Stores the data object passed in to the db, retunrs new key if wasn't passed one """
+    # Choose a bucket to store our data in
+    bucket_data = g.rc.bucket(app.config['RIAK_BUCKET_PREFIX'] + bucket_name)
+    value.update({"lastUpdated": unix_timestamp()})
+    # Supply a key to store our data under
+    if not key:
+        key = appuuid()
+        data_item = bucket_data.new(key, data=value)
+    else:
+        data_item = bucket_data.get(key)
+        data_item.set_data(value)
+    data_item.store()
+    return key
+
+
+def history_append(key, msg):
+    """ Appends something to the "history" element of an existing event """
+    products = g.rc.bucket(app.config['RIAK_BUCKET_PREFIX'] + 'products')
+    if item_exists(key):
+        product = products.get(key)  # always run product_exists first
+        details = product.get_data()  # retrieve the data
+        if "history" in details:
+            details["history"].update({unix_timestamp(): msg})
+        else:
+            details.update({"history": {unix_timestamp(): msg}})
+        db_store(details, key)
+        return True
+    else:
+        return False
+
+
+def bucket_item_load(bucket_name, key):
+    """ Loads the product from db and returns the resulting object """
+    bucket_data = g.rc.bucket(app.config['RIAK_BUCKET_PREFIX'] + bucket_name)
+    product = bucket_data.get(key)  # always run product_exists first
+    details = product.get_data()  # What???
+    return True
+
+
+def bucket_item_delete(bucket_name, key, removevariants=False, removeimages=False):
+    """ Removes the product from the bucket. Optionally remove variants and images too. Bad to leave them around. """
+    bucket_data = g.rc.bucket(app.config['RIAK_BUCKET_PREFIX'] + bucket_name)
+    if bucket_data.get(key).exists():
+        bucket_data.get(key).delete()
+        return True
+    else:
+        return False
+
+
+def get_bucket_list(bucket_name):
+    bucket_data = g.rc.bucket(
+        app.config['RIAK_BUCKET_PREFIX'] + bucket_name).get_keys()
+    return bucket_data
