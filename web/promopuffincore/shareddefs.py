@@ -6,6 +6,7 @@ import string
 import random  # for unique key gen
 import calendar
 import datetime
+import uuid
 from app import app
 
 
@@ -21,13 +22,17 @@ def appuuid():
     return str(unix_timestamp()) + '-' + random.choice(string.ascii_letters) + random.choice(string.ascii_letters)
 
 
+def realuuid():
+    return uuid.uuid4().hex
+
+
 def accounts_api_token_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = request.args.get("auth", "")
         if 'account_id' in kwargs:
             main.accounts.abort_account_not_found(kwargs['account_id'])
-            if token == main.accounts.accounts_data[kwargs['account_id']]['api_key']:
+            if token == main.accounts.accounts_data[kwargs['account_id']]["api_key"]:
                 pass
             elif token == app.config['PROMOPUFFIN_API_KEY']:
                 pass
@@ -45,7 +50,6 @@ def campaigns_api_token_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = request.args.get("auth", "")
-        # print kwargs
         if 'campaign_id' in kwargs:
             main.campaigns.abort_campaign_not_found(kwargs['campaign_id'])
             account_id = main.campaigns.campaigns_data[kwargs['campaign_id']]['account_id']

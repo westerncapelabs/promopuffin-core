@@ -13,6 +13,7 @@ from redeem import Redeem
 import accounts as accounts
 import campaigns as campaigns
 import codes as codes
+import validate as validate
 
 
 def init_db():

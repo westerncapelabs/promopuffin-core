@@ -1,4 +1,5 @@
 from flask.ext.restful import reqparse, Resource, abort
+import main
 from app import api
 
 import shareddefs
@@ -6,18 +7,17 @@ import shareddefs
 codes_data = {}
 
 parser = reqparse.RequestParser()
-parser.add_argument('code', type=unicode)
-parser.add_argument('friendly_code', type=unicode)
-parser.add_argument('type', type=unicode)
-parser.add_argument('description', type=unicode)
+parser.add_argument('code', required=True, type=unicode, case_sensitive=True)
+parser.add_argument('friendly_code', required=True, type=unicode, case_sensitive=True)
+parser.add_argument('description', required=True, type=unicode)
 parser.add_argument('status', type=unicode, default="unused")
-parser.add_argument('value_type', type=unicode)
-parser.add_argument('value_amount', type=float, default=0)
-parser.add_argument('value_currency', type=unicode, default="ZAR")
-parser.add_argument('minimum', type=float, default=0)
-parser.add_argument('minimum_currency', type=unicode, default="ZAR")
-parser.add_argument('total', type=float, default=0)
-parser.add_argument('remaining', type=float, default=0)
+parser.add_argument('value_type', required=True, type=unicode)
+parser.add_argument('value_amount', required=True, type=float, default=0)
+parser.add_argument('value_currency', type=unicode, default=main.app.config['CURRENCY'])
+parser.add_argument('minimum', required=True, type=float, default=0)
+parser.add_argument('total', required=True, type=int, default=0)
+parser.add_argument('history_msg', type=unicode)
+parser.add_argument('remaining', required=True, type=int, default=0)
 
 
 def abort_code_not_found(code_id):
@@ -34,10 +34,41 @@ def find_all_campaign_codes(campaign_id):
     return temp_data
 
 
-# returns a copy of codes_data
 def get_data(code_id):
     abort_code_not_found(code_id)
     return dict(codes_data[code_id])
+
+
+def set_data(code_id, data):
+    abort_code_not_found(code_id)
+    codes_data[code_id] = data
+    return True
+
+
+def validate_new_codes_data(args):
+    errors = []
+    if args['value_amount'] < 0:
+        errors.append("value_amount is less than 0")
+
+    if args['minimum'] < 0:
+        errors.append("minimum is less than 0")
+
+    if args['total'] < 0:
+        errors.append("total is less than 0")
+
+    if args['remaining'] > args['total']:
+        errors.append("Number of remaining is greater than total")
+
+    if args['remaining'] < 0:
+        errors.append("remaining is less than 0")
+
+    return errors
+
+
+def append_to_history(code_id, history_msg):
+    abort_code_not_found(code_id)
+    code = codes_data[code_id]
+    code['history_msg'].append(history_msg)
 
 
 class Codes(Resource):
@@ -50,23 +81,28 @@ class Codes(Resource):
     def post(self, campaign_id):
         """ saves a new code """
         args = parser.parse_args()
-        code_id = 'uuid_%d' % (len(codes_data) + 1)
-        # code_id = appuuid()
+        code_id = shareddefs.appuuid()
+
+        # validate input data
+        errors = validate_new_codes_data(args)
+        if len(errors) > 0:
+            return errors, 400
+
         codes_data[code_id] = {
             'campaign_id': campaign_id,
             'code': args['code'],
             'friendly_code': args['friendly_code'],
-            "type": args['type'],
             "description": args['description'],
             "status": args['status'],
             "value_type": args['value_type'],
             "value_amount": args['value_amount'],
             "value_currency": args['value_currency'],
             "minimum": args['minimum'],
-            "minimum_currency": args['minimum_currency'],
             "total": args['total'],
+            "history_msg": [],
             "remaining": args['remaining'],
         }
+        codes_data[code_id]["history_msg"].append("Initialised on:" + unicode(shareddefs.unix_timestamp()))
         return codes_data[code_id], 201
 
 api.add_resource(Codes, '/campaigns/<string:campaign_id>/codes')
@@ -82,21 +118,31 @@ class Code(Resource):
     @shareddefs.campaigns_api_token_required
     def put(self, campaign_id, code_id):
         args = parser.parse_args()
-        code = {
-            'code': args['code'],
-            'friendly_code': args['friendly_code'],
-            "type": args['type'],
-            "description": args['description'],
-            "status": args['status'],
-            "value_type": args['value_type'],
-            "value_amount": args['value_amount'],
-            "value_currency": args['value_currency'],
-            "minimum": args['minimum'],
-            "minimum_currency": args['minimum_currency'],
-            "total": args['total'],
-            "remaining": args['remaining'],
-        }
+
+        # validate input data
+        errors = validate_new_codes_data(args)
+        if len(errors) > 0:
+            return errors, 400
+
         abort_code_not_found(code_id)
+        code = codes_data[code_id]
+
+        code['campaign_id'] = campaign_id
+        code['code'] = args['code']
+        code['friendly_code'] = args['friendly_code']
+        code["description"] = args['description']
+        code["status"] = args['status']
+        code["value_type"] = args['value_type']
+        code["value_amount"] = args['value_amount']
+        code["value_currency"] = args['value_currency']
+        code["minimum"] = args['minimum']
+        code["total"] = args['total']
+        if "history_msg" in args:
+            code['history_msg'].append(args['history_msg'])
+        else:
+            code['history_msg'].append("Updated: " + unicode(shareddefs.unix_timestamp()))
+        code["remaining"] = args['remaining']
+
         codes_data[code_id] = code
         return code, 201
 

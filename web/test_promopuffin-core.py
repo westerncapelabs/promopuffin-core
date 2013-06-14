@@ -81,6 +81,10 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         assert "Unauthorized" in rv.data
         assert rv.status_code == 401
 
+    def test_accounts_account_post_no_data(self):
+        rv = self.app.post('/accounts?auth=somekey', data="")
+        assert rv.status_code == 400
+
     def test_accounts_account_get_not_authenticated(self):
         rv = self.app.get('/accounts/uuid_1?auth=somedskfjslf')
         assert "Unauthorized" in rv.data
@@ -96,10 +100,14 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         assert "Unauthorized" in rv.data
         assert rv.status_code == 401
 
+    def test_accounts_account_put_no_data(self):
+        rv = self.app.put('/accounts/uuid_1?auth=thisandthat', data="")
+        assert rv.status_code == 400
+
     """ Campaigns Tests """
     def test_campaigns_list(self):
         rv = self.app.get('/campaigns?auth=somekey')
-        assert "Campaign1" in rv.data
+        assert "Campaign3" in rv.data
 
     def test_campaigns_add_new(self):
         rv = self.app.post("/campaigns?auth=somekey", data=test_data.data_campaigns_post_good)
@@ -137,7 +145,7 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         assert rv.status_code == 404
 
     def test_campaigns_campaign_status_list_found(self):
-        rv = self.app.get('/campaigns/uuid_1/status?auth=somekey')
+        rv = self.app.get('/campaigns/uuid_2/status?auth=somekey')
         assert rv.status_code == 200
         assert "running" in rv.data
 
@@ -164,6 +172,10 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         assert "Unauthorized" in rv.data
         assert rv.status_code == 401
 
+    def test_campaigns_campaign_post_no_data(self):
+        rv = self.app.post('/campaigns?auth=somekey', data="")
+        assert rv.status_code == 400
+
     def test_campaigns_campaign_get_not_authenticated(self):
         rv = self.app.get('/campaigns/uuid_1?auth=somedskfjslf')
         assert "Unauthorized" in rv.data
@@ -173,6 +185,14 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         rv = self.app.put('/campaigns/uuid_1?auth=somedskfjslf', data=test_data.data_campaigns_put_good)
         assert "Unauthorized" in rv.data
         assert rv.status_code == 401
+
+    def test_campaigns_campaign_no_campaign_id(self):
+        rv = self.app.put('/campaigns?auth=somekey', data=test_data.data_campaigns_put_good)
+        assert rv.status_code == 405
+
+    def test_campaigns_campaign_put_no_data(self):
+        rv = self.app.put('/campaigns/uuid_1?auth=somekey', data="")
+        assert rv.status_code == 400
 
     def test_campaigns_campaign_delete_not_authenticated(self):
         rv = self.app.delete('/campaigns/uuid_1?auth=somedskfjslf')
@@ -189,10 +209,22 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         assert "Unauthorized" in rv.data
         assert rv.status_code == 401
 
+    def test_campaigns_campaign_status_no_data(self):
+        rv = self.app.post('/campaigns/uuid_1/status?auth=somekey', data="")
+        assert rv.status_code == 400
+
+    def test_campaigns_campaign_status_no_campaign_id(self):
+        rv = self.app.post('/campaigns/status?auth=somekey', data=test_data.data_campaigns_status_post_good)
+        assert rv.status_code == 405  # method not allowed
+
+    def test_campaigns_campaign_put_bad(self):
+        rv = self.app.put('/campaigns/uuid_1?auth=somekey', data=test_data.data_campaigns_put_bad)
+        assert "Start datetime starts after end datetime" in rv.data
+
     """ Codes Tests """
     def test_campaigns_campaign_codes_list(self):
-        rv = self.app.get('/campaigns/uuid_1/codes?auth=somekey')
-        assert "ACT-EKL-ABCDEF" in rv.data
+        rv = self.app.get('/campaigns/uuid_3/codes?auth=thisandthat')
+        assert "QWZ-EMD-ABCDEF" in rv.data
 
     def test_campaigns_campaign_codes_list_not_authenticated(self):
         rv = self.app.post('/campaigns/uuid_1/codes?auth=some3432423f22key')
@@ -203,6 +235,10 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         rv = self.app.post('/campaigns/uuid_1/codes?auth=somekey', data=test_data.data_campaigns_codes_post_good)
         assert rv.status_code == 201
         assert "ABC-DEF-GIJKLM" in rv.data
+
+    def test_campaigns_campaign_codes_code_post_no_data(self):
+        rv = self.app.post('campaigns/uuid_1/codes?auth=somekey', data="")
+        assert rv.status_code == 400
 
     def test_campaigns_campaign_codes_post_not_authenticated(self):
         rv = self.app.post('/campaigns/uuid_1/codes?auth=some3432423f22key', data=test_data.data_campaigns_codes_post_good)
@@ -254,6 +290,14 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         rv = self.app.put('/campaigns/uuid_1/codes/uuid_432dfs341?auth=somekey', data=test_data.data_campaigns_codes_put_good)
         assert rv.status_code == 404
 
+    def test_campaigns_campaign_codes_put_no_data(self):
+        rv = self.app.put('/campaigns/uuid_1/codes/uuid_1?auth=somekey', data="")
+        assert rv.status_code == 400
+
+    def test_campaigns_campaign_codes_no_campaign_id(self):
+        rv = self.app.put('/campaigns/codes/uuid_1?auth=thisandthat', data=test_data.data_campaigns_codes_put_good)
+        assert rv.status_code == 404
+
     """ Validation Tests """
     def test_validate_success_percentage(self):
         rv = self.app.post('/validate', data=test_data.data_validation_post_percentage_good)
@@ -269,6 +313,46 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         rv = self.app.post('/validate', data=test_data.data_validation_post_bad)
         assert rv.status_code == 400
         assert "false" in rv.data
+
+    def test_validate_no_data(self):
+        rv = self.app.post('/validate', data="")
+        assert "Code None doesn't exist" in rv.data
+        assert rv.status_code == 404
+
+    """ Redeemed Tests """
+    def test_redeem_percentage_success(self):
+        rv = self.app.post('/redeem/uuid_3?auth=thisandthat', data=test_data.data_redeem_percentage_good)
+        assert rv.status_code == 201
+        assert "true" in rv.data
+
+    def test_redeem_percentage_success_admin_auth(self):
+        rv = self.app.post('/redeem/uuid_3?auth=somekey', data=test_data.data_redeem_percentage_good)
+        assert rv.status_code == 201
+        assert "true" in rv.data
+
+    def test_redeem_percentage_fail(self):
+        rv = self.app.post('/redeem/uuid_2?auth=thisandthat', data=test_data.data_redeem_percentage_bad)
+        assert rv.status_code == 400
+        assert "false" in rv.data
+
+    def test_redeem_fixed_success(self):
+        rv = self.app.post('/redeem/uuid_3?auth=thisandthat', data=test_data.data_redeem_fixed_good)
+        assert rv.status_code == 201
+        assert "true" in rv.data
+
+    def test_redeem_auth_fail(self):
+        rv = self.app.post('/redeem/uuid_1?auth=dskfsld9', data=test_data.data_redeem_percentage_good)
+        assert rv.status_code == 401
+        assert "Unauthorized" in rv.data
+
+    def test_redeem_no_data(self):
+        rv = self.app.post('/redeem/uuid_1?auth=somekey', data="")
+        assert "Code None doesn't exist" in rv.data
+        assert rv.status_code == 404
+
+    def test_redeem_no_campaign_id(self):
+        rv = self.app.post('/redeem?auth=somekey', data=test_data.data_redeem_percentage_good)
+        assert rv.status_code == 404
 
 if __name__ == '__main__':
     unittest.main()

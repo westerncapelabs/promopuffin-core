@@ -1,3 +1,4 @@
+from flask import g
 from flask.ext.restful import reqparse, Resource, abort
 from app import api
 import shareddefs
@@ -23,10 +24,8 @@ accounts_data = {}
 # }
 
 parser = reqparse.RequestParser()
-parser.add_argument('username', type=unicode)
-parser.add_argument('password', type=unicode)
-parser.add_argument('api_key', type=unicode)
-parser.add_argument('auth', type=unicode)
+parser.add_argument('username', required=True, type=unicode)
+parser.add_argument('password', required=True, type=unicode)
 
 
 def abort_account_not_found(account_id):
@@ -50,11 +49,12 @@ class Accounts(Resource):
     def post(self):
         """ saves a new account """
         args = parser.parse_args()
-        account_id = 'uuid_%d' % (len(accounts_data) + 1)
+
+        account_id = shareddefs.appuuid()
         accounts_data[account_id] = {
             'username': args['username'],
-            'password': args['password'],
-            "api_key": args['api_key'],
+            'password': g.bcrypt.generate_password_hash(args['password']),
+            "api_key": shareddefs.appuuid(),
         }
         return accounts_data[account_id], 201
 
@@ -78,13 +78,14 @@ class Account(Resource):
     @shareddefs.accounts_api_token_required
     def put(self, account_id):
         args = parser.parse_args()
-        account = {
-            'username': args['username'],
-            'password': args['password'],
-            "api_key": args['api_key'],
-        }
+
         abort_account_not_found(account_id)
+        account = accounts_data[account_id]
+        account['username'] = args['username']
+        account['password'] = g.bcrypt.generate_password_hash(args['password'])
+
         accounts_data[account_id] = account
+
         return account, 201
 
 api.add_resource(Account, '/accounts/<string:account_id>')
