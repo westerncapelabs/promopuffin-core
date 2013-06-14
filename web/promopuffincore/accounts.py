@@ -26,7 +26,11 @@ accounts_data = {}
 parser = reqparse.RequestParser()
 parser.add_argument('username', required=True, type=unicode)
 parser.add_argument('password', required=True, type=unicode)
-parser.add_argument('account_id', type=unicode, case_sensitive=True)
+
+login_parser = reqparse.RequestParser()
+login_parser.add_argument('username', required=True, type=unicode, case_sensitive=True)
+login_parser.add_argument('password', required=True, type=unicode, case_sensitive=True)
+login_parser.add_argument('account_id', required=True, type=unicode, case_sensitive=True)
 
 
 def abort_account_not_found(account_id):
@@ -100,7 +104,7 @@ api.add_resource(Account, '/accounts/<string:account_id>')
 class AccountLogin(Resource):
     """ Login into a specific account """
     def post(self):
-        args = parser.parse_args()
+        args = login_parser.parse_args()
         abort_account_not_found(args['account_id'])
         account = accounts_data[args['account_id']]
 
