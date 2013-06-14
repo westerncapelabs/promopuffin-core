@@ -82,7 +82,7 @@ def db_store(bucket_name, value, key=False):
     """ Stores the data object passed in to the db, retunrs new key if wasn't passed one """
     # Choose a bucket to store our data in
     bucket_data = g.rc.bucket(app.config['RIAK_BUCKET_PREFIX'] + bucket_name)
-    value.update({"lastUpdated": unix_timestamp()})
+    # value.update({"lastUpdated": unix_timestamp()})
     # Supply a key to store our data under
     if not key:
         key = appuuid()
