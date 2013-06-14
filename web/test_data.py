@@ -12,6 +12,16 @@ data_accounts_put_good = {
     "password": "testweak"
 }
 
+data_accounts_login_good = {
+    "username": "user1@example.com",
+    "password": "bcryptedhash",
+}
+
+data_accounts_login_bad = {
+    "username": "user1@example.com",
+    "password": "sdfskldfjskldjf",
+}
+
 data_accounts_data = {
     "uuid_1": {
         "username": "user1@example.com",

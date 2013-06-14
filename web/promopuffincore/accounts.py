@@ -28,11 +28,17 @@ parser = reqparse.RequestParser()
 parser.add_argument('username', required=True, type=unicode)
 parser.add_argument('password', required=True, type=unicode)
 
+login_parser = reqparse.RequestParser()
+login_parser.add_argument('username', required=True, type=unicode, case_sensitive=True)
+login_parser.add_argument('password', required=True, type=unicode, case_sensitive=True)
+login_parser.add_argument('account_id', required=True, type=unicode, case_sensitive=True)
+
+
 class Accounts(Resource):
     @shareddefs.accounts_api_token_required
     def get(self):
         """ lists all accounts """
-        return shareddefs.get_bucket_list('accounts')
+        return get_bucket_list()
 
     @shareddefs.accounts_api_token_required
     def post(self):
@@ -40,12 +46,20 @@ class Accounts(Resource):
         args = parser.parse_args()
 
         account_id = shareddefs.appuuid()
-        accounts_data[account_id] = {
+        accounts_data = {
             'username': args['username'],
             'password': g.bcrypt.generate_password_hash(args['password']),
-            "api_key": shareddefs.appuuid(),
+            "api_key": shareddefs.realuuid(),
         }
-        return accounts_data[account_id], 201
+        # save to DB
+        account_store(accounts_data, account_id)
+
+        response = {
+            "account_id": account_id,
+            "username": accounts_data['username'],
+            "api_key": accounts_data['api_key'],
+        }
+        return response, 201
 
 api.add_resource(Accounts, '/accounts')
 
@@ -55,29 +69,54 @@ class Account(Resource):
     @shareddefs.accounts_api_token_required
     def get(self, account_id):
         """ Just one account details """
-        abort_account_not_found(account_id)
-        return accounts_data[account_id], 200
+        account_exists(account_id)
+        return account_load(account_id), 200
 
     @shareddefs.accounts_api_token_required
     def delete(self, account_id):
-        abort_account_not_found(account_id)
-        del accounts_data[account_id]
+        account_exists(account_id)
+        account_delete(account_id)
         return 'Account Successfully Deleted', 204
 
     @shareddefs.accounts_api_token_required
     def put(self, account_id):
         args = parser.parse_args()
 
-        abort_account_not_found(account_id)
-        account = accounts_data[account_id]
-        account['username'] = args['username']
-        account['password'] = g.bcrypt.generate_password_hash(args['password'])
+        account_exists(account_id)
+        account_data = {
+            'username': args['username'],
+            'password': g.bcrypt.generate_password_hash(args['password']),
+        }
 
-        accounts_data[account_id] = account
+        # save to DB
+        item_id = account_store(account_data, account_id)
+        account = account_load(item_id)
 
-        return account, 201
+        response = {
+            "account_id": item_id,
+            "username": account['username'],
+            "api_key": account['api_key'],
+        }
+
+        return response, 201
 
 api.add_resource(Account, '/accounts/<string:account_id>')
+
+
+class AccountLogin(Resource):
+    """ Login into a specific account """
+    def post(self):
+        args = login_parser.parse_args()
+        account_exists(args['account_id'])
+        account = account_load(args['account_id'])
+
+        if account['username'] == args['username']:
+            if g.bcrypt.check_password_hash(account['password'], args['password']):
+                return account['api_key'], 201
+
+        return "Unauthorized: Incorrect username and password match", 401
+
+api.add_resource(AccountLogin, '/accounts/login')
 
 # class AccountSearch(Resource):
 #     def get(self):
@@ -101,7 +140,6 @@ def account_store(data, account_id=False):
     """ Stores the data object passed in to the db, retunrs new key if wasn't passed one """
     # Choose a bucket to store our data in
     bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
-    # value.update({"lastUpdated": unix_timestamp()})
     # Supply a key to store our data under
     if not account_id:
         account_id = shareddefs.appuuid()
@@ -121,7 +159,7 @@ def account_load(account_id):
 
 
 def account_delete(account_id):
-    """ Removes the product from the bucket. Optionally remove variants and images too. Bad to leave them around. """
+    """ Removes the product from the bucket. """
     bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
     if bucket_data.get(account_id).exists():
         bucket_data.get(account_id).delete()

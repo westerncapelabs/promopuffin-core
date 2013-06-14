@@ -13,6 +13,9 @@ parser.add_argument('end', required=True, type=unicode, default=''+datetime.utcn
 parser.add_argument('status', type=unicode, default="pending")
 parser.add_argument('account_id', required=True, type=unicode, case_sensitive=True)
 
+status_parser = reqparse.RequestParser()
+status_parser.add_argument('status', required=True, type=unicode, default="pending")
+
 
 def abort_campaign_not_found(campaign_id):
     if campaign_id not in campaigns_data:
@@ -107,7 +110,7 @@ class CampaignStatus(Resource):
 
     @shareddefs.campaigns_api_token_required
     def post(self, campaign_id):
-        args = parser.parse_args()
+        args = status_parser.parse_args()
 
         """request status change to pending,running,halted"""
         abort_campaign_not_found(campaign_id)
