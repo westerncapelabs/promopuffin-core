@@ -54,9 +54,13 @@ class Accounts(Resource):
         accounts_data[account_id] = {
             'username': args['username'],
             'password': g.bcrypt.generate_password_hash(args['password']),
-            "api_key": shareddefs.appuuid(),
+            "api_key": shareddefs.realuuid(),
         }
-        return accounts_data[account_id], 201
+        response = {
+            "account_id": account_id,
+            "account_data": accounts_data[account_id]
+        }
+        return response, 201
 
 api.add_resource(Accounts, '/accounts')
 
@@ -89,6 +93,22 @@ class Account(Resource):
         return account, 201
 
 api.add_resource(Account, '/accounts/<string:account_id>')
+
+
+class AccountLogin(Resource):
+    """ Login into a specific account """
+    def post(self, account_id):
+        args = parser.parse_args()
+        abort_account_not_found(account_id)
+        account = accounts_data[account_id]
+
+        if account['username'] == args['username']:
+            if g.bcrypt.check_password_hash(account['password'], args['password']):
+                return account['api_key'], 201
+
+        return "Unauthorized: Incorrect username and password match", 401
+
+api.add_resource(AccountLogin, '/accounts/login/<string:account_id>')
 
 # class AccountSearch(Resource):
 #     def get(self):
