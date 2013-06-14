@@ -1,6 +1,5 @@
 from flask import g
 import unittest
-import riak
 from promopuffincore import main, accounts, campaigns, codes
 import test_data
 
@@ -16,10 +15,9 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         # main.app.config['DATABASE'] = db_conf
         main.app.config['TESTING'] = True
         main.app.config['RIAK_BUCKET_PREFIX'] = 'test_'
-        self.rc = riak.RiakClient(host=main.app.config['RIAK_HOST'], port=main.app.config['RIAK_PORT'], prefix=main.app.config['RIAK_PREFIX'], transport_class=main.app.config['RIAK_TRANSPORT_CLASS'])
-        # accounts.accounts_data = dict(test_data.data_accounts_data)
-        # campaigns.campaigns_data = dict(test_data.data_campaigns_data)
-        # codes.codes_data = dict(test_data.data_campaigns_codes_data)
+        accounts.accounts_data = dict(test_data.data_accounts_data)
+        campaigns.campaigns_data = dict(test_data.data_campaigns_data)
+        codes.codes_data = dict(test_data.data_campaigns_codes_data)
         self.app = main.app.test_client()
 
     def tearDown(self):
@@ -360,15 +358,18 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     """ RIAK Tests """
     def test_riak_account_write_success(self):
-        # print self.rc
-        account_bucket = self.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
+        account_bucket = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
         new_account = account_bucket.new(data=test_data.data_accounts_post_good)
-        print new_account
         new_account.store()
 
     # def test_riak_accounts_get_list(self):
-    #     account_bucket = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
+    #     account_bucket = self.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
     #     print account_bucket.get_keys()
+
+    # def test_riak_accounts_get_item_success(self):
+    #     account_bucket = self.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
+    #     account = account_bucket.get("")
+    #     print account
 
 
 if __name__ == '__main__':
