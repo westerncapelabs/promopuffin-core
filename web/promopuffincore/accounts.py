@@ -26,6 +26,7 @@ accounts_data = {}
 parser = reqparse.RequestParser()
 parser.add_argument('username', required=True, type=unicode)
 parser.add_argument('password', required=True, type=unicode)
+parser.add_argument('account_id', type=unicode, case_sensitive=True)
 
 
 def abort_account_not_found(account_id):
@@ -58,7 +59,8 @@ class Accounts(Resource):
         }
         response = {
             "account_id": account_id,
-            "account_data": accounts_data[account_id]
+            "username": accounts_data[account_id]['username'],
+            "api_key": accounts_data[account_id]['api_key'],
         }
         return response, 201
 
@@ -97,10 +99,10 @@ api.add_resource(Account, '/accounts/<string:account_id>')
 
 class AccountLogin(Resource):
     """ Login into a specific account """
-    def post(self, account_id):
+    def post(self):
         args = parser.parse_args()
-        abort_account_not_found(account_id)
-        account = accounts_data[account_id]
+        abort_account_not_found(args['account_id'])
+        account = accounts_data[args['account_id']]
 
         if account['username'] == args['username']:
             if g.bcrypt.check_password_hash(account['password'], args['password']):
@@ -108,7 +110,7 @@ class AccountLogin(Resource):
 
         return "Unauthorized: Incorrect username and password match", 401
 
-api.add_resource(AccountLogin, '/accounts/login/<string:account_id>')
+api.add_resource(AccountLogin, '/accounts/login')
 
 # class AccountSearch(Resource):
 #     def get(self):

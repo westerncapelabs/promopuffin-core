@@ -37,20 +37,27 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
     def test_accounts_account_login_success(self):
         rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_login_good)
         account_data = json.loads(rv.data)
-        rv = self.app.post('/accounts/login/' + account_data['account_id'], data=test_data.data_accounts_login_good)
+        data = test_data.data_accounts_login_good
+        data['account_id'] = account_data['account_id']
+        rv = self.app.post('/accounts/login', data=data)
         assert rv.status_code == 201
 
     def test_accounts_account_login_fail(self):
         rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_login_good)
         account_data = json.loads(rv.data)
-        rv = self.app.post('/accounts/login/' + account_data['account_id'], data=test_data.data_accounts_login_bad)
+        data = test_data.data_accounts_login_bad
+        data['account_id'] = account_data['account_id']
+        rv = self.app.post('/accounts/login', data=data)
         assert rv.status_code == 401
         assert "Unauthorized: Incorrect username and password match" in rv.data
 
     def test_accounts_account_login_no_data(self):
         rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_login_good)
         account_data = json.loads(rv.data)
-        rv = self.app.post('/accounts/login/' + account_data['account_id'], data="")
+        data = {
+            'account_id': account_data['account_id'],
+        }
+        rv = self.app.post('/accounts/login', data=data)
         assert rv.status_code == 400
 
     def test_accounts_list(self):
