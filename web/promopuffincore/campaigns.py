@@ -40,7 +40,6 @@ class Campaigns(Resource):
         if args['start'] > args['end']:
             return "Start datetime starts after end datetime", 400
 
-        # campaign_id = 'uuid_%d' % (len(campaigns_data) + 1)
         campaign_id = shareddefs.appuuid()
         campaigns_data[campaign_id] = {
             'name': args['name'],

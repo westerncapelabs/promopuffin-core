@@ -81,7 +81,6 @@ class Codes(Resource):
     def post(self, campaign_id):
         """ saves a new code """
         args = parser.parse_args()
-        # code_id = 'uuid_%d' % (len(codes_data) + 1)
         code_id = shareddefs.appuuid()
 
         # validate input data
