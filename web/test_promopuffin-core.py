@@ -1,4 +1,3 @@
-from flask import g
 import unittest
 from promopuffincore import main, accounts, campaigns, codes
 import test_data
@@ -6,6 +5,21 @@ import json
 
 
 class PromoPuffinCoreTestCase(unittest.TestCase):
+    def clear_db(self):
+        # clear 'test_' buckets
+        accounts.clear_bucket()
+        campaigns.clear_bucket()
+        codes.clear_bucket()
+
+    def init_db(self):
+        # populate 'test_' buckets
+        for account in test_data.data_accounts_data:
+            accounts.account_store(test_data.data_accounts_data[account], account)
+        # for campaign in test_data.data_campaigns_data:
+        #     campaigns.campaign_store(test_data.data_campaigns_data[campaign], campaign)
+        # for code in test_data.data_codes_data:
+        #     codes.code_store(test_data.data_campaigns_codes_data[code], code)
+
     def setUp(self):
         # db_conf = {
         #     'name': '',
@@ -16,24 +30,26 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         # main.app.config['DATABASE'] = db_conf
         main.app.config['TESTING'] = True
         main.app.config['RIAK_BUCKET_PREFIX'] = 'test_'
-        accounts.accounts_data = dict(test_data.data_accounts_data)
-        campaigns.campaigns_data = dict(test_data.data_campaigns_data)
-        codes.codes_data = dict(test_data.data_campaigns_codes_data)
+        # accounts.accounts_data = dict(test_data.data_accounts_data)
+        # campaigns.campaigns_data = dict(test_data.data_campaigns_data)
+        # codes.codes_data = dict(test_data.data_campaigns_codes_data)
         self.app = main.app.test_client()
+        # self.init_db()
 
     def tearDown(self):
-        pass
+        # self.clear_db()
         # os.close(self.db_fd)
         # os.unlink(main.app.config['DATABASE']['name'])
+        pass
 
     """ general tests """
-    def test_404_render(self):
-        rv = self.app.get('/kldjfljsdlkfjsdlkjfdslkj')  # Should never validate!
-        assert '404' in rv.data  # Should be the <title> of the page
+    # def test_404_render(self):
+    #     rv = self.app.get('/kldjfljsdlkfjsdlkjfdslkj')  # Should never validate!
+    #     assert '404' in rv.data  # Should be the <title> of the page
 
-    def test_hello_world(self):
-        rv = self.app.get('/heartbeat')
-        assert 'Hello World!' in rv.data  # Should be the <title> of the page
+    # def test_hello_world(self):
+    #     rv = self.app.get('/heartbeat')
+    #     assert 'Hello World!' in rv.data  # Should be the <title> of the page
 
     """ Accounts Tests """
     # def test_accounts_account_login_success(self):

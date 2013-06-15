@@ -6,24 +6,6 @@ import main
 
 accounts_data = {}
 
-# accounts_data_backup = {
-#     "uuid_1": {
-#         "username": "user1@example.com",
-#         "password": "bcryptedhash",
-#         "api_key": "thisandthat",
-#     },
-#     "uuid_2": {
-#         "username": "user2@example.com",
-#         "password": "bcryptedhash",
-#         "api_key": "thisandthat",
-#     },
-#     "uuid_3": {
-#         "username": "user3@example.com",
-#         "password": "bcryptedhash",
-#         "api_key": "thisandthat",
-#     },
-# }
-
 parser = reqparse.RequestParser()
 parser.add_argument('username', required=True, type=unicode)
 parser.add_argument('password', required=True, type=unicode)
@@ -130,7 +112,7 @@ api.add_resource(AccountLogin, '/accounts/login')
 
 
 def account_exists(account_id):
-    """ Check product exists - return True/False """
+    """ Check account exists - return True/False """
     bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
     if not bucket_data.get(account_id).exists():
         abort(404, message="Account {} doesn't exist".format(account_id))
@@ -152,14 +134,17 @@ def account_store(data, account_id=False):
 
 
 def account_load(account_id):
-    """ Loads the product from db and returns the resulting object """
-    bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
-    product = bucket_data.get(account_id)  # always run product_exists first
-    return product.get_data()
+    """ Loads the account from db and returns the resulting data """
+    if account_exists(account_id):
+        bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
+        data_item = bucket_data.get(account_id)
+        return data_item.get_data()
+    else:
+        pass  # account exists will handle errors
 
 
 def account_delete(account_id):
-    """ Removes the product from the bucket. """
+    """ Removes the account from the bucket. """
     bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
     if bucket_data.get(account_id).exists():
         bucket_data.get(account_id).delete()
@@ -169,4 +154,17 @@ def account_delete(account_id):
 
 
 def get_bucket_list():
-    return g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts').get_keys()
+    bucket = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
+    bucket_keys = bucket.get_keys()
+    response = {}
+    for key in bucket_keys:
+        response[key] = bucket.get(key).get_data()
+    return response
+
+
+def clear_bucket():
+    bucket = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
+    bucket_keys = bucket.get_keys()
+    for key in bucket_keys:
+        bucket.get(key).delete()
+    return "Deleted all values from accounts bucket..."

@@ -1,7 +1,9 @@
+from flask import g
 from flask.ext.restful import reqparse, Resource, abort
 from app import api
 from datetime import datetime
 
+import main
 import shareddefs
 
 campaigns_data = {}
@@ -17,22 +19,11 @@ status_parser = reqparse.RequestParser()
 status_parser.add_argument('status', required=True, type=unicode, default="pending")
 
 
-def abort_campaign_not_found(campaign_id):
-    if campaign_id not in campaigns_data:
-        abort(404, message="Campaign {} doesn't exist".format(campaign_id))
-
-
-# returns a copy of campaigns_data
-def get_data(campaign_id):
-    abort_campaign_not_found(campaign_id)
-    return dict(campaigns_data[campaign_id])
-
-
 class Campaigns(Resource):
     @shareddefs.campaigns_api_token_required
     def get(self):
         """ returns list of all campaigns """
-        return campaigns_data
+        return get_bucket_list()
 
     @shareddefs.campaigns_api_token_required
     def post(self):
@@ -44,14 +35,18 @@ class Campaigns(Resource):
             return "Start datetime starts after end datetime", 400
 
         campaign_id = shareddefs.appuuid()
-        campaigns_data[campaign_id] = {
+        campaign_data = {
             'name': args['name'],
             "start": args['start'],
             "end": args['end'],
             'status': args['status'],
             'account_id': args['account_id'],
         }
-        return campaigns_data[campaign_id], 201
+
+        # store to DB
+        campaign_store(campaign_data, campaign_id)
+
+        return campaign_data, 201
 
 api.add_resource(Campaigns, '/campaigns')
 
@@ -67,13 +62,13 @@ class Campaign(Resource):
     @shareddefs.campaigns_api_token_required
     def get(self, campaign_id):
         """ Just one campaign detail """
-        abort_campaign_not_found(campaign_id)
-        return campaigns_data[campaign_id], 200
+        campaign_exists(campaign_id)
+        return campaign_load(campaign_id), 200
 
     @shareddefs.campaigns_api_token_required
     def delete(self, campaign_id):
-        abort_campaign_not_found(campaign_id)
-        del campaigns_data[campaign_id]
+        campaign_exists(campaign_id)
+        campaign_delete(campaign_id)
         return 'Campaign Successfully Deleted', 204
 
     @shareddefs.campaigns_api_token_required
@@ -84,16 +79,17 @@ class Campaign(Resource):
         if args['start'] > args['end']:
             return "Start datetime starts after end datetime", 400
 
-        abort_campaign_not_found(campaign_id)
-        campaign = campaigns_data[campaign_id]
+        campaign_exists(campaign_id)
+        campaign = {
+            'name': args['name'],
+            "start": args['start'],
+            "end": args['end'],
+            'status': args['status'],
+            'account_id': args['account_id'],
+        }
 
-        campaign['name'] = args['name']
-        campaign["start"] = args['start']
-        campaign["end"] = args['end']
-        campaign['status'] = args['status']
-        campaign['account_id'] = args['account_id']
-
-        campaigns_data[campaign_id] = campaign
+        # save to DB
+        campaign_store(campaign, campaign_id)
 
         return campaign, 201
 
@@ -105,16 +101,84 @@ class CampaignStatus(Resource):
     @shareddefs.campaigns_api_token_required
     def get(self, campaign_id):
         """returns status of just one campaign """
-        abort_campaign_not_found(campaign_id)
-        return campaigns_data[campaign_id]['status'], 200
+        campaign_exists(campaign_id)
+        return campaign_load(campaign_id)['status'], 200
 
     @shareddefs.campaigns_api_token_required
     def post(self, campaign_id):
         args = status_parser.parse_args()
 
         """request status change to pending,running,halted"""
-        abort_campaign_not_found(campaign_id)
-        campaigns_data[campaign_id]['status'] = args['status']
+        campaign_exists(campaign_id)
+        campaign = campaign_load(campaign_id)
+        campaign['status'] = args['status']
+        campaign_store(campaign, campaign_id)
+
         return campaigns_data[campaign_id], 201
 
 api.add_resource(CampaignStatus, '/campaigns/<string:campaign_id>/status')
+
+
+#####################
+# DB Helper Functions
+#####################
+
+
+def campaign_exists(campaign_id):
+    """ Check campaign exists - return True/False """
+    bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'campaigns')
+    if not bucket_data.get(campaign_id).exists():
+        abort(404, message="Campaign {} doesn't exist".format(campaign_id))
+
+
+# Save new and update (as far I can tell)
+def campaign_store(data, campaign_id=False):
+    """ Stores the data object passed in to the db, returns new key if wasn't passed one """
+    # Choose a bucket to store our data in
+    bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'campaigns')
+    # Supply a key to store our data under
+    if not campaign_id:
+        campaign_id = shareddefs.appuuid()
+        data_item = bucket_data.new(campaign_id, data=data)
+    else:
+        data_item = bucket_data.get(campaign_id)
+        data_item.set_data(data)
+    data_item.store()
+    return campaign_id
+
+
+def campaign_load(campaign_id):
+    """ Loads the campaign from db and returns the resulting data """
+    if campaign_exists(campaign_id):
+        bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'campaigns')
+        data_item = bucket_data.get(campaign_id)
+        return data_item.get_data()
+    else:
+        pass  # campaign_exists will handle errors for us
+
+
+def campaign_delete(campaign_id):
+    """ Removes the campaign from the bucket. """
+    bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'campaigns')
+    if bucket_data.get(campaign_id).exists():
+        bucket_data.get(campaign_id).delete()
+        return True
+    else:
+        return False
+
+
+def get_bucket_list():
+    bucket = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'campaigns')
+    bucket_keys = bucket.get_keys()
+    response = {}
+    for key in bucket_keys:
+        response[key] = bucket.get(key).get_data()
+    return response
+
+
+def clear_bucket():
+    bucket = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
+    bucket_keys = bucket.get_keys()
+    for key in bucket_keys:
+        bucket.get(key).delete()
+    return "Deleted all values from accounts bucket..."
