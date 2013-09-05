@@ -10,11 +10,6 @@ parser = reqparse.RequestParser()
 parser.add_argument('username', required=True, type=unicode)
 parser.add_argument('password', required=True, type=unicode)
 
-login_parser = reqparse.RequestParser()
-login_parser.add_argument('username', required=True, type=unicode, case_sensitive=True)
-login_parser.add_argument('password', required=True, type=unicode, case_sensitive=True)
-login_parser.add_argument('account_id', required=True, type=unicode, case_sensitive=True)
-
 
 class Accounts(Resource):
     @shareddefs.accounts_api_token_required
@@ -84,6 +79,12 @@ class Account(Resource):
 
 api.add_resource(Account, '/accounts/<string:account_id>')
 
+### ACCOUNT LOGIN
+login_parser = reqparse.RequestParser()
+login_parser.add_argument('username', required=True, type=unicode, case_sensitive=True)
+login_parser.add_argument('password', required=True, type=unicode, case_sensitive=True)
+login_parser.add_argument('account_id', required=True, type=unicode, case_sensitive=True)
+
 
 class AccountLogin(Resource):
     """ Login into a specific account """
@@ -91,7 +92,6 @@ class AccountLogin(Resource):
         args = login_parser.parse_args()
         account_exists(args['account_id'])
         account = account_load(args['account_id'])
-
         if account['username'] == args['username']:
             if g.bcrypt.check_password_hash(account['password'], args['password']):
                 return account['api_key'], 201
@@ -116,6 +116,8 @@ def account_exists(account_id):
     bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
     if not bucket_data.get(account_id).exists():
         abort(404, message="Account {} doesn't exist".format(account_id))
+    else:
+        return True
 
 
 def account_store(data, account_id=False):
@@ -138,7 +140,8 @@ def account_load(account_id):
     if account_exists(account_id):
         bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
         data_item = bucket_data.get(account_id)
-        return data_item.get_data()
+        account = data_item.get_data()
+        return account
     else:
         pass  # account exists will handle errors
 

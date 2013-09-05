@@ -18,4 +18,4 @@ class Configuration(object):
     RIAK_PORT = 8087
     RIAK_PREFIX = 'riak'
     RIAK_TRANSPORT_CLASS = riak.RiakPbcTransport
-    RIAK_BUCKET_PREFIX = ''
+    RIAK_BUCKET_PREFIX = 'promopuffin_core_'

@@ -25,5 +25,5 @@ def get_bcrypt_ext():
 @app.before_request
 def before_request():
     get_riak_cleint()
-    print "Riak client created..."
+    # print "Riak client created..."
     get_bcrypt_ext()

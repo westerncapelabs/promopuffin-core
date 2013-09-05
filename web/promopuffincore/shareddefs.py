@@ -30,8 +30,9 @@ def accounts_api_token_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = request.args.get("auth", "")
+        print kwargs
         if 'account_id' in kwargs:
-            main.accounts.abort_account_not_found(kwargs['account_id'])
+            main.accounts.account_exists(kwargs['account_id'])
             if token == main.accounts.accounts_data[kwargs['account_id']]["api_key"]:
                 pass
             elif token == app.config['PROMOPUFFIN_API_KEY']:
