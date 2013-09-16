@@ -9,8 +9,8 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
     def clear_db(self):
         # clear 'test_' buckets
         self.clear_bucket('accounts')
-        # campaigns.clear_bucket()
-        # codes.clear_bucket()
+        self.clear_bucket('campaigns')
+        self.clear_bucket('codes')
 
     def clear_bucket(self, bucket):
         bucket = self.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + bucket)
@@ -19,28 +19,28 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
             bucket.get(key).delete()
         return True
 
-    def account_store(self, data, account_id=False):
+    def bucket_item_store(self, bucket_name, data, item_id=False):
         """ Stores the data object passed in to the db, retunrs new key if wasn't passed one """
         # Choose a bucket to store our data in
-        bucket_data = self.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
+        bucket_data = self.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + bucket_name)
         # Supply a key to store our data under
-        if not account_id:
-            account_id = main.shareddefs.appuuid()
-            data_item = bucket_data.new(account_id, data=data)
+        if not item_id:
+            item_id = main.shareddefs.appuuid()
+            data_item = bucket_data.new(item_id, data=data)
         else:
-            data_item = bucket_data.get(account_id)
+            data_item = bucket_data.get(item_id)
             data_item.set_data(data)
         data_item.store()
-        return account_id
+        return item_id
 
     def init_db(self):
         # populate 'test_' buckets
         for account in test_data.data_accounts_data:
-            self.account_store(test_data.data_accounts_data[account], account)
-        # for campaign in test_data.data_campaigns_data:
-        #     campaigns.campaign_store(test_data.data_campaigns_data[campaign], campaign)
-        # for code in test_data.data_codes_data:
-        #     codes.code_store(test_data.data_campaigns_codes_data[code], code)
+            self.bucket_item_store('accounts', test_data.data_accounts_data[account], account)
+        for campaign in test_data.data_campaigns_data:
+            self.bucket_item_store('campaigns', test_data.data_campaigns_data[campaign], campaign)
+        for code in test_data.data_campaigns_codes_data:
+            self.bucket_item_store('codes', test_data.data_campaigns_codes_data[code], code)
 
     def setUp(self):
         # db_conf = {
@@ -61,59 +61,50 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
 
     def tearDown(self):
         self.clear_db()
-        # os.close(self.db_fd)
-        # os.unlink(main.app.config['DATABASE']['name'])
-        # pass
 
-    """ general tests """
-    def test_404_render(self):
-        rv = self.app.get('/kldjfljsdlkfjsdlkjfdslkj')  # Should never validate!
-        assert '404' in rv.data  # Should be the <title> of the page
+    # """ general tests """
+    # def test_404_render(self):
+    #     rv = self.app.get('/kldjfljsdlkfjsdlkjfdslkj')  # Should never validate!
+    #     assert '404' in rv.data  # Should be the <title> of the page
 
-    def test_hello_world(self):
-        rv = self.app.get('/heartbeat')
-        assert 'Hello World!' in rv.data  # Should be the <title> of the page
+    # def test_hello_world(self):
+    #     rv = self.app.get('/heartbeat')
+    #     assert 'Hello World!' in rv.data  # Should be the <title> of the page
 
-    """ Accounts Tests """
-    def test_accounts_account_login_success(self):
-        rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_login_good)
-        account_data = json.loads(rv.data)
-        account_data["password"] = test_data.data_accounts_login_good["password"]
-        # data = test_data.data_accounts_login_good
-        # data['account_id'] = account_data['account_id']
-        rv = self.app.post('/accounts/login', data=account_data)
-        assert rv.status_code == 201
+    # """ Accounts Tests """
+    # def test_accounts_account_login_success(self):
+    #     rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_login_good)
+    #     account_data = json.loads(rv.data)
+    #     account_data["password"] = test_data.data_accounts_login_good["password"]
+    #     rv = self.app.post('/accounts/login', data=account_data)
+    #     assert rv.status_code == 201
 
-    def test_accounts_account_login_fail(self):
-        rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_login_good)
-        account_data = json.loads(rv.data)
-        account_data["password"] = test_data.data_accounts_login_bad["password"]
-        rv = self.app.post('/accounts/login', data=account_data)
-        assert rv.status_code == 401
-        assert "Unauthorized: Incorrect username and password match" in rv.data
+    # def test_accounts_account_login_fail(self):
+    #     rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_login_good)
+    #     account_data = json.loads(rv.data)
+    #     account_data["password"] = test_data.data_accounts_login_bad["password"]
+    #     rv = self.app.post('/accounts/login', data=account_data)
+    #     assert rv.status_code == 401
+    #     assert "Unauthorized: Incorrect username and password match" in rv.data
 
-    def test_accounts_account_login_no_data(self):
-        rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_login_good)
-        account_data = json.loads(rv.data)
-        data = {
-            'account_id': account_data['account_id'],
-        }
-        rv = self.app.post('/accounts/login', data=data)
-        assert rv.status_code == 400
+    # def test_accounts_account_login_no_data(self):
+    #     rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_login_good)
+    #     account_data = json.loads(rv.data)
+    #     rv = self.app.post('/accounts/login', data=account_data)
+    #     assert rv.status_code == 400
 
-    def test_accounts_list(self):
-        rv = self.app.get('/accounts?auth=somekey')
-        # print rv.data
-        assert "user1@example.com" in rv.data
+    # def test_accounts_list(self):
+    #     rv = self.app.get('/accounts?auth=somekey')
+    #     assert "user1@example.com" in rv.data
 
     # def test_accounts_add_new(self):
     #     rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_post_good)
     #     assert "mike+testpromopuffin@westerncapelabs.com" in rv.data
 
-    def test_accounts_account_found(self):
-        rv = self.app.get('/accounts/uuid_1?auth=somekey')
-        assert rv.status_code == 200
-        assert "user1@example.com" in rv.data
+    # def test_accounts_account_found(self):
+    #     rv = self.app.get('/accounts/uuid_1?auth=somekey')
+    #     assert rv.status_code == 200
+    #     assert "user1@example.com" in rv.data
 
     # def test_accounts_account_not_found(self):
     #     rv = self.app.get('/accounts/uuid_90j0j0j?auth=somekey')
@@ -173,7 +164,7 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
     #     rv = self.app.put('/accounts/uuid_1?auth=thisandthat', data="")
     #     assert rv.status_code == 400
 
-    # """ Campaigns Tests """
+    """ Campaigns Tests """
     # def test_campaigns_list(self):
     #     rv = self.app.get('/campaigns?auth=somekey')
     #     assert "Campaign3" in rv.data
@@ -367,26 +358,26 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
     #     rv = self.app.put('/campaigns/codes/uuid_1?auth=thisandthat', data=test_data.data_campaigns_codes_put_good)
     #     assert rv.status_code == 404
 
-    # """ Validation Tests """
-    # def test_validate_success_percentage(self):
-    #     rv = self.app.post('/validate', data=test_data.data_validation_post_percentage_good)
-    #     assert rv.status_code == 201
-    #     assert "true" in rv.data
+    """ Validation Tests """
+    def test_validate_success_percentage(self):
+        rv = self.app.post('/validate', data=test_data.data_validation_post_percentage_good)
+        assert rv.status_code == 201
+        assert "true" in rv.data
 
-    # def test_validate_success_fixed(self):
-    #     rv = self.app.post('/validate', data=test_data.data_validation_post_fixed_good)
-    #     assert rv.status_code == 201
-    #     assert "true" in rv.data
+    def test_validate_success_fixed(self):
+        rv = self.app.post('/validate', data=test_data.data_validation_post_fixed_good)
+        assert rv.status_code == 201
+        assert "true" in rv.data
 
-    # def test_validate_fail(self):
-    #     rv = self.app.post('/validate', data=test_data.data_validation_post_bad)
-    #     assert rv.status_code == 400
-    #     assert "false" in rv.data
+    def test_validate_fail(self):
+        rv = self.app.post('/validate', data=test_data.data_validation_post_bad)
+        assert rv.status_code == 400
+        assert "false" in rv.data
 
-    # def test_validate_no_data(self):
-    #     rv = self.app.post('/validate', data="")
-    #     assert "Code None doesn't exist" in rv.data
-    #     assert rv.status_code == 404
+    def test_validate_no_data(self):
+        rv = self.app.post('/validate', data="")
+        assert "Code None doesn't exist" in rv.data
+        assert rv.status_code == 404
 
     # """ Redeemed Tests """
     # def test_redeem_percentage_success(self):

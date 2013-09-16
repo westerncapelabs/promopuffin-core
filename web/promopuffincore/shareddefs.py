@@ -30,10 +30,10 @@ def accounts_api_token_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         token = request.args.get("auth", "")
-        print kwargs
+        # print kwargs
         if 'account_id' in kwargs:
             main.accounts.account_exists(kwargs['account_id'])
-            if token == main.accounts.accounts_data[kwargs['account_id']]["api_key"]:
+            if token == main.accounts.account_load(kwargs['account_id'])["api_key"]:
                 pass
             elif token == app.config['PROMOPUFFIN_API_KEY']:
                 pass
@@ -52,10 +52,10 @@ def campaigns_api_token_required(f):
     def decorated_function(*args, **kwargs):
         token = request.args.get("auth", "")
         if 'campaign_id' in kwargs:
-            main.campaigns.abort_campaign_not_found(kwargs['campaign_id'])
-            account_id = main.campaigns.campaigns_data[kwargs['campaign_id']]['account_id']
-            main.accounts.abort_account_not_found(account_id)
-            if token == main.accounts.accounts_data[account_id]['api_key']:
+            main.campaigns.campaign_exists(kwargs['campaign_id'])
+            account_id = main.campaigns.campaign_load(kwargs['campaign_id'])['account_id']
+            main.accounts.account_exists(account_id)
+            if token == main.accounts.account_load(account_id)['api_key']:
                 pass
             elif token == app.config['PROMOPUFFIN_API_KEY']:
                 pass

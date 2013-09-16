@@ -22,14 +22,13 @@ class Accounts(Resource):
         """ saves a new account """
         args = parser.parse_args()
 
-        account_id = shareddefs.appuuid()
         accounts_data = {
             'username': args['username'],
             'password': g.bcrypt.generate_password_hash(args['password']),
             "api_key": shareddefs.realuuid(),
         }
         # save to DB
-        account_store(accounts_data, account_id)
+        account_id = account_store(accounts_data)
 
         response = {
             "account_id": account_id,
@@ -46,7 +45,6 @@ class Account(Resource):
     @shareddefs.accounts_api_token_required
     def get(self, account_id):
         """ Just one account details """
-        account_exists(account_id)
         return account_load(account_id), 200
 
     @shareddefs.accounts_api_token_required
@@ -114,7 +112,8 @@ api.add_resource(AccountLogin, '/accounts/login')
 def account_exists(account_id):
     """ Check account exists - return True/False """
     bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
-    if not bucket_data.get(account_id).exists():
+    t = bucket_data.get(account_id)
+    if not t.exists():
         abort(404, message="Account {} doesn't exist".format(account_id))
     else:
         return True
@@ -129,8 +128,11 @@ def account_store(data, account_id=False):
         account_id = shareddefs.appuuid()
         data_item = bucket_data.new(account_id, data=data)
     else:
-        data_item = bucket_data.get(account_id)
-        data_item.set_data(data)
+        if account_exists(account_id):
+            data_item = bucket_data.get(account_id)
+            temp = data_item.get_data()
+            # update data record
+            data_item.set_data(data)
     data_item.store()
     return account_id
 

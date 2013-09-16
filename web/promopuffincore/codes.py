@@ -81,7 +81,6 @@ class Codes(Resource):
     def post(self, campaign_id):
         """ saves a new code """
         args = parser.parse_args()
-        code_id = shareddefs.appuuid()
 
         # validate input data
         errors = validate_new_codes_data(args)
@@ -103,7 +102,7 @@ class Codes(Resource):
             "remaining": args['remaining'],
         }
         # save to DB
-        code_store(code_data, code_id)
+        code_id = code_store(code_data)
 
         return code_data, 201
 
@@ -139,6 +138,7 @@ class Code(Resource):
             "minimum": args['minimum'],
             "total": args['total'],
             "remaining": args['remaining'],
+            "history_msg": [],
         }
         if "history_msg" in args:
             code_data['history_msg'].append(args['history_msg'])
@@ -169,6 +169,8 @@ def code_exists(code_id):
     bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'codes')
     if not bucket_data.get(code_id).exists():
         abort(404, message="Code {} doesn't exist".format(code_id))
+    else:
+        return True
 
 
 def code_store(data, code_id=False):
@@ -180,8 +182,16 @@ def code_store(data, code_id=False):
         code_id = shareddefs.appuuid()
         data_item = bucket_data.new(code_id, data=data)
     else:
-        data_item = bucket_data.get(code_id)
-        data_item.set_data(data)
+        if code_exists(code_id):
+            data_item = bucket_data.get(code_id)
+            temp = data_item.get_data()
+            # update data record
+            for field in temp:
+                if field in data:
+                    temp[field] = data[field]
+                else:
+                    temp[field] = temp[field]
+            data_item.set_data(temp)
     data_item.store()
     return code_id
 

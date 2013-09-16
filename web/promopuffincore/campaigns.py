@@ -34,7 +34,6 @@ class Campaigns(Resource):
         if args['start'] > args['end']:
             return "Start datetime starts after end datetime", 400
 
-        campaign_id = shareddefs.appuuid()
         campaign_data = {
             'name': args['name'],
             "start": args['start'],
@@ -44,7 +43,7 @@ class Campaigns(Resource):
         }
 
         # store to DB
-        campaign_store(campaign_data, campaign_id)
+        campaign_id = campaign_store(campaign_data)
 
         return campaign_data, 201
 
@@ -112,9 +111,10 @@ class CampaignStatus(Resource):
         campaign_exists(campaign_id)
         campaign = campaign_load(campaign_id)
         campaign['status'] = args['status']
-        campaign_store(campaign, campaign_id)
+        temp_id = campaign_store(campaign, campaign_id)
+        campaign_item = campaign_load(temp_id)
 
-        return campaigns_data[campaign_id], 201
+        return campaign_item, 201
 
 api.add_resource(CampaignStatus, '/campaigns/<string:campaign_id>/status')
 
@@ -129,6 +129,8 @@ def campaign_exists(campaign_id):
     bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'campaigns')
     if not bucket_data.get(campaign_id).exists():
         abort(404, message="Campaign {} doesn't exist".format(campaign_id))
+    else:
+        return True
 
 
 # Save new and update (as far I can tell)
@@ -141,8 +143,9 @@ def campaign_store(data, campaign_id=False):
         campaign_id = shareddefs.appuuid()
         data_item = bucket_data.new(campaign_id, data=data)
     else:
-        data_item = bucket_data.get(campaign_id)
-        data_item.set_data(data)
+        if campaign_exists(campaign_id):
+            data_item = bucket_data.get(campaign_id)
+            data_item.set_data(data)
     data_item.store()
     return campaign_id
 
