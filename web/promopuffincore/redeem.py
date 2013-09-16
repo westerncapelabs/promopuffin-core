@@ -20,11 +20,11 @@ def redeem_data(data, campaign_id):
     }
 
     # list of validation checks
-    code_data = main.codes.get_data(data['code_id'])
+    code_data = main.codes.code_load(data['code_id'])
     if code_data['remaining'] < 1:
         response['error'].append("no more redeem codes available")
 
-    if code_data['status'] is not "available":
+    if code_data['status'] != "available":
         response['error'].append("campaign is "+code_data['status'])
 
     if code_data['campaign_id'] != campaign_id:
@@ -44,7 +44,8 @@ def redeem_data(data, campaign_id):
         code_data['remaining'] -= 1
         if code_data['remaining'] == 0:
             code_data['status'] = "redeemed"
-        write_success = main.codes.set_data(data['code_id'], code_data)
+        main.codes.code_store(code_data, data['code_id'])
+        write_success = True
 
     if write_success is True:  # updates campaign codes_data
         return response

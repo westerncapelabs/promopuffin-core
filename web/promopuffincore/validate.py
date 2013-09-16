@@ -1,4 +1,5 @@
 from flask.ext.restful import reqparse, Resource
+from flask import g
 from app import api
 
 import main
@@ -15,7 +16,7 @@ validate_data = {}
 
 
 def validate_data(data):
-    code_data = main.codes.get_data(data['code_id'])
+    code_data = main.codes.code_load(data['code_id'])
     response = {
         "valid": False,
         "error": [],
@@ -34,8 +35,8 @@ def validate_data(data):
     if data['transaction_amount'] < code_data['minimum']:
         response['error'].append("transaction_amount was less than campaign minimum")
 
-    account_id = main.campaigns.get_data(code_data['campaign_id'])['account_id']
-    if data['api_key'] != main.accounts.get_data(account_id)['api_key']:
+    account_id = main.campaigns.campaign_load(code_data['campaign_id'])['account_id']
+    if data['api_key'] != main.accounts.account_load(account_id)['api_key']:
         response['error'].append("api_key did not match accounts api_key for campaign")
 
     # check if any errors in validation
@@ -57,6 +58,7 @@ class Validate(Resource):
     """ Validates code data """
     def post(self):
         args = parser.parse_args()
+        main.codes.code_exists(args['code_id'])
         data = {
             'code_id': args['code_id'],
             'api_key': args['api_key'],

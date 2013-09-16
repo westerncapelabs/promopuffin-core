@@ -131,8 +131,8 @@ def account_store(data, account_id=False):
         if account_exists(account_id):
             data_item = bucket_data.get(account_id)
             temp = data_item.get_data()
-            # update data record
-            data_item.set_data(data)
+            temp.update(data)
+            data_item.set_data(temp)
     data_item.store()
     return account_id
 

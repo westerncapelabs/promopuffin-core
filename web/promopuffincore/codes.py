@@ -57,7 +57,7 @@ def validate_new_codes_data(args):
 
 def append_to_history(code_id, msg):
     """ Appends something to the "history" element of an existing event """
-    bucket = g.rc.bucket(main.config['RIAK_BUCKET_PREFIX'] + 'codes')
+    bucket = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'codes')
     if code_exists(code_id):
         code = bucket.get(code_id)  # always run product_exists first
         details = code.get_data()  # retrieve the data
@@ -65,7 +65,8 @@ def append_to_history(code_id, msg):
             details["history"].update({shareddefs.unix_timestamp(): msg})
         else:
             details.update({"history": {shareddefs.unix_timestamp(): msg}})
-        code_store(details, code_id)
+        code.set_data(details)
+        code.store()
         return True
     else:
         return False
@@ -167,6 +168,9 @@ api.add_resource(Code, '/campaigns/<string:campaign_id>/codes/<string:code_id>')
 def code_exists(code_id):
     """ Check code exists - return True/False """
     bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'codes')
+    if code_id is None:
+        abort(404, message="Code {} doesn't exist".format(code_id))
+    # print(code_id)
     if not bucket_data.get(code_id).exists():
         abort(404, message="Code {} doesn't exist".format(code_id))
     else:
@@ -185,13 +189,8 @@ def code_store(data, code_id=False):
         if code_exists(code_id):
             data_item = bucket_data.get(code_id)
             temp = data_item.get_data()
-            # update data record
-            for field in temp:
-                if field in data:
-                    temp[field] = data[field]
-                else:
-                    temp[field] = temp[field]
-            data_item.set_data(temp)
+            temp.update(data)
+            data_item.set_data(temp) # update data record
     data_item.store()
     return code_id
 

@@ -145,7 +145,9 @@ def campaign_store(data, campaign_id=False):
     else:
         if campaign_exists(campaign_id):
             data_item = bucket_data.get(campaign_id)
-            data_item.set_data(data)
+            temp = data_item.get_data()
+            temp.update(data)
+            data_item.set_data(temp)
     data_item.store()
     return campaign_id
 
