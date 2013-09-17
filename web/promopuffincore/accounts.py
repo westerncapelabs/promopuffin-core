@@ -81,16 +81,16 @@ api.add_resource(Account, '/accounts/<string:account_id>')
 login_parser = reqparse.RequestParser()
 login_parser.add_argument('username', required=True, type=unicode, case_sensitive=True)
 login_parser.add_argument('password', required=True, type=unicode, case_sensitive=True)
-login_parser.add_argument('account_id', required=True, type=unicode, case_sensitive=True)
 
 
 class AccountLogin(Resource):
     """ Login into a specific account """
-    def post(self):
+    def post(self):        
         args = login_parser.parse_args()
-        account_exists(args['account_id'])
-        account = account_load(args['account_id'])
-        if account['username'] == args['username']:
+        results = get_account(args['username'])
+
+        for account_id in results:
+            account = account_load(account_id)
             if g.bcrypt.check_password_hash(account['password'], args['password']):
                 return account['api_key'], 201
 
@@ -107,6 +107,26 @@ api.add_resource(AccountLogin, '/accounts/login')
 #####################
 # DB Helper Functions
 #####################
+
+
+def get_account(username):
+    """ trys to find user account using username """
+    query = g.rc.add(main.app.config['RIAK_BUCKET_PREFIX'] + 'accounts')
+    # This gets just keys
+    query.map("""
+    function(v, meta, arg) {
+        var data = JSON.parse(v.values[0].data);
+        if(data['username'] == arg['username']){
+            return [v.key];
+        } else {
+            return [];
+        }
+    }""", {"arg": {"username": username}})
+    result = query.run()    
+    if result is None:
+        return False
+    else:
+        return result
 
 
 def account_exists(account_id):
