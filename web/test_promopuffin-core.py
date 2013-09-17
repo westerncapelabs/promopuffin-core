@@ -1,10 +1,47 @@
 import unittest
 from promopuffincore import main, accounts, campaigns, codes
 import test_data
+import riak
 import json
 
 
 class PromoPuffinCoreTestCase(unittest.TestCase):
+    def clear_db(self):
+        # clear 'test_' buckets
+        self.clear_bucket('accounts')
+        self.clear_bucket('campaigns')
+        self.clear_bucket('codes')
+
+    def clear_bucket(self, bucket):
+        bucket = self.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + bucket)
+        bucket_keys = bucket.get_keys()
+        for key in bucket_keys:
+            bucket.get(key).delete()
+        return True
+
+    def bucket_item_store(self, bucket_name, data, item_id=False):
+        """ Stores the data object passed in to the db, retunrs new key if wasn't passed one """
+        # Choose a bucket to store our data in
+        bucket_data = self.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + bucket_name)
+        # Supply a key to store our data under
+        if not item_id:
+            item_id = main.shareddefs.appuuid()
+            data_item = bucket_data.new(item_id, data=data)
+        else:
+            data_item = bucket_data.get(item_id)
+            data_item.set_data(data)
+        data_item.store()
+        return item_id
+
+    def init_db(self):
+        # populate 'test_' buckets
+        for account in test_data.data_accounts_data:
+            self.bucket_item_store('accounts', test_data.data_accounts_data[account], account)
+        for campaign in test_data.data_campaigns_data:
+            self.bucket_item_store('campaigns', test_data.data_campaigns_data[campaign], campaign)
+        for code in test_data.data_campaigns_codes_data:
+            self.bucket_item_store('codes', test_data.data_campaigns_codes_data[code], code)
+
     def setUp(self):
         # db_conf = {
         #     'name': '',
@@ -14,15 +51,16 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         # self.db_fd, db_conf["name"] = tempfile.mkstemp()
         # main.app.config['DATABASE'] = db_conf
         main.app.config['TESTING'] = True
-        accounts.accounts_data = dict(test_data.data_accounts_data)
-        campaigns.campaigns_data = dict(test_data.data_campaigns_data)
-        codes.codes_data = dict(test_data.data_campaigns_codes_data)
+        main.app.config['RIAK_BUCKET_PREFIX'] = 'promopuffin_core_test_'
+        self.rc = riak.RiakClient(host=main.app.config['RIAK_HOST'], port=main.app.config['RIAK_PORT'], prefix=main.app.config['RIAK_PREFIX'], transport_class=main.app.config['RIAK_TRANSPORT_CLASS'])
+        # accounts.accounts_data = dict(test_data.data_accounts_data)
+        # campaigns.campaigns_data = dict(test_data.data_campaigns_data)
+        # codes.codes_data = dict(test_data.data_campaigns_codes_data)
         self.app = main.app.test_client()
+        self.init_db()
 
     def tearDown(self):
-        pass
-        # os.close(self.db_fd)
-        # os.unlink(main.app.config['DATABASE']['name'])
+        self.clear_db()
 
     """ general tests """
     def test_404_render(self):
@@ -37,27 +75,22 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
     def test_accounts_account_login_success(self):
         rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_login_good)
         account_data = json.loads(rv.data)
-        data = test_data.data_accounts_login_good
-        data['account_id'] = account_data['account_id']
-        rv = self.app.post('/accounts/login', data=data)
+        account_data["password"] = test_data.data_accounts_login_good["password"]
+        rv = self.app.post('/accounts/login', data=account_data)
         assert rv.status_code == 201
 
     def test_accounts_account_login_fail(self):
         rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_login_good)
         account_data = json.loads(rv.data)
-        data = test_data.data_accounts_login_bad
-        data['account_id'] = account_data['account_id']
-        rv = self.app.post('/accounts/login', data=data)
+        account_data["password"] = test_data.data_accounts_login_bad["password"]
+        rv = self.app.post('/accounts/login', data=account_data)
         assert rv.status_code == 401
         assert "Unauthorized: Incorrect username and password match" in rv.data
 
     def test_accounts_account_login_no_data(self):
         rv = self.app.post("/accounts?auth=somekey", data=test_data.data_accounts_login_good)
         account_data = json.loads(rv.data)
-        data = {
-            'account_id': account_data['account_id'],
-        }
-        rv = self.app.post('/accounts/login', data=data)
+        rv = self.app.post('/accounts/login', data=account_data)
         assert rv.status_code == 400
 
     def test_accounts_list(self):
@@ -346,7 +379,7 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
         assert "Code None doesn't exist" in rv.data
         assert rv.status_code == 404
 
-    """ Redeemed Tests """
+    # """ Redeemed Tests """
     def test_redeem_percentage_success(self):
         rv = self.app.post('/redeem/uuid_3?auth=thisandthat', data=test_data.data_redeem_percentage_good)
         assert rv.status_code == 201
@@ -380,6 +413,7 @@ class PromoPuffinCoreTestCase(unittest.TestCase):
     def test_redeem_no_campaign_id(self):
         rv = self.app.post('/redeem?auth=somekey', data=test_data.data_redeem_percentage_good)
         assert rv.status_code == 404
+
 
 if __name__ == '__main__':
     unittest.main()

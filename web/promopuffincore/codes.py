@@ -1,10 +1,9 @@
+from flask import g
 from flask.ext.restful import reqparse, Resource, abort
-import main
 from app import api
 
+import main
 import shareddefs
-
-codes_data = {}
 
 parser = reqparse.RequestParser()
 parser.add_argument('code', required=True, type=unicode, case_sensitive=True)
@@ -20,13 +19,9 @@ parser.add_argument('history_msg', type=unicode)
 parser.add_argument('remaining', required=True, type=int, default=0)
 
 
-def abort_code_not_found(code_id):
-    if code_id not in codes_data:
-        abort(404, message="Code {} doesn't exist".format(code_id))
-
-
 def find_all_campaign_codes(campaign_id):
     temp_data = {}
+    codes_data = get_bucket_list()
     for code in codes_data.itervalues():
         if campaign_id == code['campaign_id']:
             temp_data[len(codes_data) + 1] = dict(code)
@@ -34,14 +29,9 @@ def find_all_campaign_codes(campaign_id):
     return temp_data
 
 
-def get_data(code_id):
-    abort_code_not_found(code_id)
-    return dict(codes_data[code_id])
-
-
 def set_data(code_id, data):
-    abort_code_not_found(code_id)
-    codes_data[code_id] = data
+    code_exists(code_id)
+    code_store(data, code_id)
     return True
 
 
@@ -65,10 +55,21 @@ def validate_new_codes_data(args):
     return errors
 
 
-def append_to_history(code_id, history_msg):
-    abort_code_not_found(code_id)
-    code = codes_data[code_id]
-    code['history_msg'].append(history_msg)
+def append_to_history(code_id, msg):
+    """ Appends something to the "history" element of an existing event """
+    bucket = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'codes')
+    if code_exists(code_id):
+        code = bucket.get(code_id)  # always run product_exists first
+        details = code.get_data()  # retrieve the data
+        if "history" in details:
+            details["history"].update({shareddefs.unix_timestamp(): msg})
+        else:
+            details.update({"history": {shareddefs.unix_timestamp(): msg}})
+        code.set_data(details)
+        code.store()
+        return True
+    else:
+        return False
 
 
 class Codes(Resource):
@@ -81,14 +82,13 @@ class Codes(Resource):
     def post(self, campaign_id):
         """ saves a new code """
         args = parser.parse_args()
-        code_id = shareddefs.appuuid()
 
         # validate input data
         errors = validate_new_codes_data(args)
         if len(errors) > 0:
             return errors, 400
 
-        codes_data[code_id] = {
+        code_data = {
             'campaign_id': campaign_id,
             'code': args['code'],
             'friendly_code': args['friendly_code'],
@@ -102,8 +102,10 @@ class Codes(Resource):
             "history_msg": [],
             "remaining": args['remaining'],
         }
-        codes_data[code_id]["history_msg"].append("Initialised on:" + unicode(shareddefs.unix_timestamp()))
-        return codes_data[code_id], 201
+        # save to DB
+        code_id = code_store(code_data)
+
+        return code_data, 201
 
 api.add_resource(Codes, '/campaigns/<string:campaign_id>/codes')
 
@@ -112,8 +114,8 @@ class Code(Resource):
     """ Individual Code """
     @shareddefs.campaigns_api_token_required
     def get(self, campaign_id, code_id):
-        abort_code_not_found(code_id)
-        return codes_data[code_id], 200
+        code_exists(code_id)
+        return code_load(code_id), 200
 
     @shareddefs.campaigns_api_token_required
     def put(self, campaign_id, code_id):
@@ -124,32 +126,107 @@ class Code(Resource):
         if len(errors) > 0:
             return errors, 400
 
-        abort_code_not_found(code_id)
-        code = codes_data[code_id]
-
-        code['campaign_id'] = campaign_id
-        code['code'] = args['code']
-        code['friendly_code'] = args['friendly_code']
-        code["description"] = args['description']
-        code["status"] = args['status']
-        code["value_type"] = args['value_type']
-        code["value_amount"] = args['value_amount']
-        code["value_currency"] = args['value_currency']
-        code["minimum"] = args['minimum']
-        code["total"] = args['total']
+        code_exists(code_id)
+        code_data = {
+            'campaign_id': campaign_id,
+            'code': args['code'],
+            'friendly_code': args['friendly_code'],
+            "description": args['description'],
+            "status": args['status'],
+            "value_type": args['value_type'],
+            "value_amount": args['value_amount'],
+            "value_currency": args['value_currency'],
+            "minimum": args['minimum'],
+            "total": args['total'],
+            "remaining": args['remaining'],
+            "history_msg": [],
+        }
         if "history_msg" in args:
-            code['history_msg'].append(args['history_msg'])
+            code_data['history_msg'].append(args['history_msg'])
         else:
-            code['history_msg'].append("Updated: " + unicode(shareddefs.unix_timestamp()))
-        code["remaining"] = args['remaining']
+            code_data['history_msg'].append("Updated: " + unicode(shareddefs.unix_timestamp()))
 
-        codes_data[code_id] = code
-        return code, 201
+        # save to DB
+        code_store(code_data, code_id)
+
+        return code_data, 201
 
     @shareddefs.campaigns_api_token_required
     def delete(self, campaign_id, code_id):
-        abort_code_not_found(code_id)
-        del codes_data[code_id]
+        code_exists(code_id)
+        code_delete(code_id)
         return 'Code Successfully Deleted', 204
 
 api.add_resource(Code, '/campaigns/<string:campaign_id>/codes/<string:code_id>')
+
+
+#####################
+# DB Helper Functions
+#####################
+
+
+def code_exists(code_id):
+    """ Check code exists - return True/False """
+    bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'codes')
+    if code_id is None:
+        abort(404, message="Code {} doesn't exist".format(code_id))
+    # print(code_id)
+    if not bucket_data.get(code_id).exists():
+        abort(404, message="Code {} doesn't exist".format(code_id))
+    else:
+        return True
+
+
+def code_store(data, code_id=False):
+    """ Stores the data object passed in to the db, returns new key if wasn't passed one """
+    # Choose a bucket to store our data in
+    bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'codes')
+    # Supply a key to store our data under
+    if not code_id:
+        code_id = shareddefs.appuuid()
+        data_item = bucket_data.new(code_id, data=data)
+    else:
+        if code_exists(code_id):
+            data_item = bucket_data.get(code_id)
+            temp = data_item.get_data()
+            temp.update(data)
+            data_item.set_data(temp) # update data record
+    data_item.store()
+    return code_id
+
+
+def code_load(code_id):
+    """ Loads the code from db and returns the resulting data """
+    if code_exists(code_id):
+        bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'codes')
+        data_item = bucket_data.get(code_id)
+        return data_item.get_data()
+    else:
+        pass  # code_exists will handle errors for us
+
+
+def code_delete(code_id):
+    """ Removes the code from the bucket. """
+    bucket_data = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'codes')
+    if bucket_data.get(code_id).exists():
+        bucket_data.get(code_id).delete()
+        return True
+    else:
+        return False
+
+
+def get_bucket_list():
+    bucket = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'codes')
+    bucket_keys = bucket.get_keys()
+    response = {}
+    for key in bucket_keys:
+        response[key] = bucket.get(key).get_data()
+    return response
+
+
+def clear_bucket():
+    bucket = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'codes')
+    bucket_keys = bucket.get_keys()
+    for key in bucket_keys:
+        bucket.get(key).delete()
+    return "Deleted all values from accounts bucket..."

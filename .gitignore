@@ -39,5 +39,6 @@ nosetests.xml
 .DS_Store
 
 rm_pyc_files.sh
-myvirtualenv/
+virtenv
+config.py
 *.swp

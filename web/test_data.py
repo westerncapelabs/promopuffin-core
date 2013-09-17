@@ -3,13 +3,11 @@ data_auth = "TESTAUTHCODE"
 data_auth_admin = "TESTAUTHADMINCODE"
 
 data_accounts_post_good = {
-    "api_key": data_auth_admin,
     "username": "mike+testpromopuffin@westerncapelabs.com",
     "password": "testweak"
 }
 
 data_accounts_put_good = {
-    # "api_key": data_auth_admin,
     "username": "user1@example.com",
     "password": "testweak"
 }
