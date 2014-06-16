@@ -165,7 +165,7 @@ def account_load(account_id):
         account = data_item.get_data()
         return account
     else:
-        pass  # account exists will handle errors
+        return False # account exists will handle errors
 
 
 def account_delete(account_id):
