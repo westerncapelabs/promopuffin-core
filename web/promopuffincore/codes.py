@@ -222,11 +222,3 @@ def get_bucket_list():
     for key in bucket_keys:
         response[key] = bucket.get(key).get_data()
     return response
-
-
-def clear_bucket():
-    bucket = g.rc.bucket(main.app.config['RIAK_BUCKET_PREFIX'] + 'codes')
-    bucket_keys = bucket.get_keys()
-    for key in bucket_keys:
-        bucket.get(key).delete()
-    return "Deleted all values from accounts bucket..."
