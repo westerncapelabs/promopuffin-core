@@ -202,7 +202,7 @@ def code_load(code_id):
         data_item = bucket_data.get(code_id)
         return data_item.get_data()
     else:
-        pass  # code_exists will handle errors for us
+        return False  # code_exists will handle errors for us
 
 
 def code_delete(code_id):

@@ -159,7 +159,7 @@ def campaign_load(campaign_id):
         data_item = bucket_data.get(campaign_id)
         return data_item.get_data()
     else:
-        pass  # campaign_exists will handle errors for us
+        return False  # campaign_exists will handle errors for us
 
 
 def campaign_delete(campaign_id):
